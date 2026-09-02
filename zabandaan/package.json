@@ -1,0 +1,16 @@
+{
+  "name": "zabandaan",
+  "version": "1.0.0",
+  "description": "Gamified Urdu-literacy web app",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "cd server && node index.js",
+    "dev:client": "cd client && npx vite --host",
+    "build": "cd client && npx vite build",
+    "start": "npm run dev"
+  },
+  "dependencies": {
+    "concurrently": "^10.0.5"
+  }
+}

@@ -1,0 +1,22 @@
+:root {
+  --color-primary: #2E7D32;
+  --color-primary-light: #66BB6A;
+  --color-accent: #FFA726;
+  --color-accent-light: #FFD54F;
+  --color-bg: #FFF8E1;
+  --color-bg-card: #FFFFFF;
+  --color-bg-dark: #2C2C2C;
+  --color-text: #333333;
+  --color-text-light: #666666;
+  --color-text-white: #FFFFFF;
+  --color-correct: #43A047;
+  --color-wrong: #E53935;
+  --color-border: #E0E0E0;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 2px 8px rgba(0,0,0,0.08);
+  --shadow-lg: 0 4px 16px rgba(0,0,0,0.12);
+  --font-urdu: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', serif;
+  --font-latin: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --transition: 0.3s ease;
+}
