@@ -11,6 +11,7 @@ export default function TracingCanvas({ letter, onComplete }) {
   const [mode, setMode] = useState('main'); // 'main' | 'dots' | 'done'
   const [score, setScore] = useState(null);
   const [canvasSize, setCanvasSize] = useState(350);
+  const [autoPlayed, setAutoPlayed] = useState(false); // whether auto-speak succeeded
   const dpr = typeof window !== 'undefined' ? (window.devicePixelRatio || 1) : 1;
 
   const strokes = letter.strokes;
@@ -30,9 +31,13 @@ export default function TracingCanvas({ letter, onComplete }) {
     return () => window.removeEventListener('resize', updateSize);
   }, []);
 
-  // Speak letter name on load
+  // Speak letter name on load; track whether auto-speak succeeded
   useEffect(() => {
-    const timer = setTimeout(() => speak(letter.nameUrdu), 400);
+    setAutoPlayed(false);
+    const timer = setTimeout(async () => {
+      const result = await speak(letter.nameUrdu, 'ur-PK', { audioUrl: letter.audioPath });
+      setAutoPlayed(result && result.ended);
+    }, 400);
     return () => clearTimeout(timer);
   }, [letter]);
 
@@ -265,7 +270,7 @@ export default function TracingCanvas({ letter, onComplete }) {
       <div style={styles.header}>
         <div style={styles.letterDisplay}>
           <span style={styles.letterChar} className="urdu-text">{letter.letter}</span>
-          <SpeakerIcon text={letter.nameUrdu} size={24} />
+          <SpeakerIcon text={letter.nameUrdu} size={24} audioUrl={letter.audioPath} />
         </div>
         <div style={styles.letterInfo}>
           <strong>{letter.name}</strong>
@@ -277,6 +282,18 @@ export default function TracingCanvas({ letter, onComplete }) {
           )}
         </div>
       </div>
+
+      {/* Tap-to-hear prompt when browser blocked auto-play */}
+      {!autoPlayed && (
+        <button
+          style={styles.tapPrompt}
+          onClick={() => {
+            speak(letter.nameUrdu, 'ur-PK', { audioUrl: letter.audioPath }).then(() => setAutoPlayed(true));
+          }}
+        >
+          🔊 Tap to hear "{letter.name}"
+        </button>
+      )}
 
       <div style={styles.canvasWrap}>
         <canvas
@@ -405,6 +422,17 @@ const styles = {
     fontSize: 13,
     color: '#999',
     marginTop: 2,
+  },
+  tapPrompt: {
+    background: '#E3F2FD',
+    border: '1.5px solid #90CAF9',
+    borderRadius: 8,
+    padding: '8px 16px',
+    cursor: 'pointer',
+    fontSize: 14,
+    fontWeight: 600,
+    color: '#1565C0',
+    transition: 'background 0.2s',
   },
   canvasWrap: {
     borderRadius: 12,

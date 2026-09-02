@@ -1,0 +1,28 @@
+# 知识卡导出索引文件
+schema_version: 1
+locale: en-US
+branch: main
+nodes_managed: true
+exported_at: "2026-09-02T18:23:08Z"
+modules:
+    "":
+        dir_name: Project Assets & Lock File
+        title: Project Assets & Lock File
+        scope:
+            - package-lock.json
+            - .aicoding-chat-workspace
+            - 01_login_page.png
+            - 02_home_dashboard.png
+            - 03_alphabet_map.png
+            - 04_tracing_canvas.png
+            - 05_idioms_game.png
+            - 06_poetry_page.png
+            - 07_profile_page.png
+            - screenshot_alphabets.png
+            - screenshot_home.png
+            - screenshot_idioms.png
+            - screenshot_poetry.png
+        source_files: []
+        children: []
+        depends_on: []
+        related_to: []

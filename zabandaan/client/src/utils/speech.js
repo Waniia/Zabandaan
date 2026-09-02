@@ -1,12 +1,18 @@
-// Web Speech API wrapper with async voice loading and fallback
+// Text-to-speech: local audio files (primary) with Web Speech API fallback.
+// Local pre-recorded MP3 files ensure reliable Urdu pronunciation regardless of
+// browser/OS voice support.
+
 let voicesCache = [];
 let voicesReady = false;
 let voicesReadyPromise = null;
 
-// Initialize voice loading - voices load asynchronously in Chrome/Edge
+// Currently active Audio element (for stopSpeaking)
+let currentAudio = null;
+
+// --- Web Speech API voice initialization (used as fallback) ---
 function initVoices() {
   if (typeof window === 'undefined' || !window.speechSynthesis) return;
-  
+
   const loadVoices = () => {
     const voices = window.speechSynthesis.getVoices();
     if (voices.length > 0) {
@@ -15,15 +21,12 @@ function initVoices() {
     }
   };
 
-  // Try loading immediately
   loadVoices();
 
-  // Listen for voices loaded event (Chrome requires this)
   if (window.speechSynthesis.onvoiceschanged !== undefined) {
     window.speechSynthesis.addEventListener('voiceschanged', loadVoices);
   }
 
-  // Also poll briefly as a fallback for browsers that don't fire the event
   if (!voicesReady) {
     let attempts = 0;
     const interval = setInterval(() => {
@@ -36,17 +39,12 @@ function initVoices() {
   }
 }
 
-// Call init on module load
 initVoices();
 
-/**
- * Get a promise that resolves when voices are available
- */
 function getVoicesAsync(timeout = 2000) {
   if (voicesReady) return Promise.resolve(voicesCache);
-  
   if (voicesReadyPromise) return voicesReadyPromise;
-  
+
   voicesReadyPromise = new Promise((resolve) => {
     const start = Date.now();
     const check = () => {
@@ -59,18 +57,14 @@ function getVoicesAsync(timeout = 2000) {
     };
     check();
   });
-  
+
   return voicesReadyPromise;
 }
 
-/**
- * Find the best available voice for the given language
- */
 function findBestVoice(lang) {
   const voices = voicesCache;
   if (voices.length === 0) return null;
-  
-  // Priority chain for Urdu
+
   return voices.find(v => v.lang === 'ur-PK')
     || voices.find(v => v.lang === 'ur')
     || voices.find(v => v.lang.startsWith('ur'))
@@ -78,52 +72,98 @@ function findBestVoice(lang) {
     || voices.find(v => v.lang.startsWith('hi'))
     || voices.find(v => v.lang === 'ar-SA')
     || voices.find(v => v.lang.startsWith('ar'))
-    || voices[0]; // fallback to any available voice
+    || voices[0];
 }
 
-/**
- * Speak text aloud using Web Speech API
- * @param {string} text - Text to speak
- * @param {string} lang - Language code (default: 'ur-PK')
- * @returns {Promise<{ended: boolean}>} - Resolves when speech ends
- */
-export async function speak(text, lang = 'ur-PK') {
-  if (!window.speechSynthesis) return { ended: false };
-  
-  // Cancel any ongoing speech
-  window.speechSynthesis.cancel();
-  
-  // Wait for voices to be available
-  await getVoicesAsync(2000);
-  
+// --- Primary: Play a pre-recorded audio file ---
+function speakAudioFile(audioUrl) {
   return new Promise((resolve) => {
+    // Stop any previous audio
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio = null;
+    }
+
+    const audio = new Audio(audioUrl);
+    currentAudio = audio;
+
+    audio.onended = () => {
+      if (currentAudio === audio) currentAudio = null;
+      resolve({ ended: true });
+    };
+
+    audio.onerror = (e) => {
+      console.warn('Audio file playback error:', e);
+      if (currentAudio === audio) currentAudio = null;
+      resolve({ ended: false });
+    };
+
+    audio.play().catch((err) => {
+      console.warn('Audio play() rejected:', err);
+      if (currentAudio === audio) currentAudio = null;
+      resolve({ ended: false });
+    });
+  });
+}
+
+// --- Fallback: Web Speech API ---
+function speakWithWebSpeech(text, lang = 'ur-PK') {
+  return new Promise(async (resolve) => {
+    if (!window.speechSynthesis) return resolve({ ended: false });
+
+    window.speechSynthesis.cancel();
+    await getVoicesAsync(2000);
+    await new Promise(r => Promise.resolve().then(r));
+
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = lang;
     utterance.rate = 0.85;
     utterance.pitch = 1.0;
     utterance.volume = 1.0;
-    
-    // Find best voice
+
     const voice = findBestVoice(lang);
     if (voice) utterance.voice = voice;
-    
-    // Resolve on end
+
     utterance.onend = () => resolve({ ended: true });
     utterance.onerror = () => resolve({ ended: false });
-    
-    // Chrome sometimes requires a small delay after cancel
-    setTimeout(() => {
-      try {
-        window.speechSynthesis.speak(utterance);
-      } catch (e) {
-        console.warn('Speech synthesis error:', e);
-        resolve({ ended: false });
-      }
-    }, 50);
+
+    try {
+      window.speechSynthesis.speak(utterance);
+    } catch (e) {
+      console.warn('Speech synthesis error:', e);
+      resolve({ ended: false });
+    }
   });
 }
 
+/**
+ * Speak text aloud.
+ * @param {string} text - Text to speak (used for Web Speech fallback)
+ * @param {string} lang - Language code (default: 'ur-PK')
+ * @param {object} [options]
+ * @param {string} [options.audioUrl] - Path to a pre-recorded audio file (preferred)
+ * @returns {Promise<{ended: boolean}>}
+ */
+export async function speak(text, lang = 'ur-PK', options = {}) {
+  // If a local audio file is provided, play it first
+  if (options.audioUrl) {
+    const result = await speakAudioFile(options.audioUrl);
+    if (result.ended) return result;
+    // Fall through to Web Speech API if file playback failed
+  }
+
+  // Fallback to Web Speech API
+  return speakWithWebSpeech(text, lang);
+}
+
 export function stopSpeaking() {
+  // Stop local audio file
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+    currentAudio = null;
+  }
+  // Stop Web Speech API
   if (window.speechSynthesis) {
     window.speechSynthesis.cancel();
   }

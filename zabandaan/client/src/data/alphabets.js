@@ -41,6 +41,8 @@ export const alphabets = [
     exampleWord: 'انار',
     exampleWordEnglish: 'Pomegranate',
     imagePath: '/images/alphabets/alif-anar.png',
+    audioPath: '/audio/alphabets/alif-name.mp3',
+    wordAudioPath: '/audio/alphabets/alif-word.mp3',
     strokes: [
       {
         type: 'main',
@@ -61,6 +63,8 @@ export const alphabets = [
     exampleWord: 'بلی',
     exampleWordEnglish: 'Cat',
     imagePath: '/images/alphabets/bay-billi.png',
+    audioPath: '/audio/alphabets/bay-name.mp3',
+    wordAudioPath: '/audio/alphabets/bay-word.mp3',
     strokes: [
       {
         type: 'main',
@@ -85,6 +89,8 @@ export const alphabets = [
     exampleWord: 'پتنگ',
     exampleWordEnglish: 'Kite',
     imagePath: '/images/alphabets/pay-patang.png',
+    audioPath: '/audio/alphabets/pay-name.mp3',
+    wordAudioPath: '/audio/alphabets/pay-word.mp3',
     strokes: [
       {
         type: 'main',
@@ -113,6 +119,8 @@ export const alphabets = [
     exampleWord: 'تالا',
     exampleWordEnglish: 'Lock',
     imagePath: '/images/alphabets/tay-taala.png',
+    audioPath: '/audio/alphabets/tay-name.mp3',
+    wordAudioPath: '/audio/alphabets/tay-word.mp3',
     strokes: [
       {
         type: 'main',
@@ -140,6 +148,8 @@ export const alphabets = [
     exampleWord: 'ٹوپی',
     exampleWordEnglish: 'Cap',
     imagePath: '/images/alphabets/ttay-topi.png',
+    audioPath: '/audio/alphabets/ttay-name.mp3',
+    wordAudioPath: '/audio/alphabets/ttay-word.mp3',
     strokes: [
       {
         type: 'main',
@@ -164,6 +174,8 @@ export const alphabets = [
     exampleWord: 'ثمر',
     exampleWordEnglish: 'Fruit',
     imagePath: '/images/alphabets/say-samar.png',
+    audioPath: '/audio/alphabets/say-name.mp3',
+    wordAudioPath: '/audio/alphabets/say-word.mp3',
     strokes: [
       {
         type: 'main',
@@ -192,6 +204,8 @@ export const alphabets = [
     exampleWord: 'جہاز',
     exampleWordEnglish: 'Ship',
     imagePath: '/images/alphabets/jeem-jahaz.png',
+    audioPath: '/audio/alphabets/jeem-name.mp3',
+    wordAudioPath: '/audio/alphabets/jeem-word.mp3',
     strokes: [
       {
         type: 'main',
@@ -216,6 +230,8 @@ export const alphabets = [
     exampleWord: 'چاند',
     exampleWordEnglish: 'Moon',
     imagePath: '/images/alphabets/chay-chand.png',
+    audioPath: '/audio/alphabets/chay-name.mp3',
+    wordAudioPath: '/audio/alphabets/chay-word.mp3',
     strokes: [
       {
         type: 'main',
@@ -244,6 +260,8 @@ export const alphabets = [
     exampleWord: 'حلقہ',
     exampleWordEnglish: 'Ring / Circle',
     imagePath: '/images/alphabets/hay-halqa.png',
+    audioPath: '/audio/alphabets/hay-name.mp3',
+    wordAudioPath: '/audio/alphabets/hay-word.mp3',
     strokes: [
       {
         type: 'main',
@@ -264,6 +282,8 @@ export const alphabets = [
     exampleWord: 'خط',
     exampleWordEnglish: 'Letter',
     imagePath: '/images/alphabets/khay-khat.png',
+    audioPath: '/audio/alphabets/khay-name.mp3',
+    wordAudioPath: '/audio/alphabets/khay-word.mp3',
     strokes: [
       {
         type: 'main',

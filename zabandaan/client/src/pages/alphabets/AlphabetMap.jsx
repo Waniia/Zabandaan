@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../../components/Navbar';
 import FeedbackFlash from '../../components/FeedbackFlash';
+import SpeakerIcon from '../../components/SpeakerIcon';
 import TracingCanvas from './TracingCanvas';
 import { alphabets } from '../../data/alphabets';
 import { usePoints } from '../../context/PointsContext';
@@ -120,7 +121,10 @@ export default function AlphabetMap() {
                 onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; }}
               >
                 <span style={styles.letterChar} className="urdu-text">{letter.letter}</span>
-                <span style={styles.letterName}>{letter.name}</span>
+                <div style={styles.nameRow}>
+                  <SpeakerIcon text={letter.nameUrdu} size={14} audioUrl={letter.audioPath} />
+                  <span style={styles.letterName}>{letter.name}</span>
+                </div>
                 {letter.imagePath && (
                   <img
                     src={letter.imagePath}
@@ -205,6 +209,11 @@ const styles = {
     fontSize: 12,
     color: '#666',
     fontWeight: 500,
+  },
+  nameRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 2,
   },
   letterImage: {
     width: 48,

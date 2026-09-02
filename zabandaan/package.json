@@ -12,5 +12,11 @@
   },
   "dependencies": {
     "concurrently": "^10.0.5"
+  },
+  "devDependencies": {
+    "msedge-tts": "^2.0.7"
+  },
+  "allowScripts": {
+    "msedge-tts@2.0.7": true
   }
 }
