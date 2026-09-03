@@ -1,24 +1,34 @@
-import { useRef, useState, useEffect, useCallback } from 'react';
+import { useRef, useState, useEffect, useCallback, useMemo } from 'react';
 import { speak } from '../../utils/speech';
 import SpeakerIcon from '../../components/SpeakerIcon';
 import { scoreTrace } from '../../utils/scoring';
 
 export default function TracingCanvas({ letter, onComplete }) {
   const canvasRef = useRef(null);
-  const [userStrokes, setUserStrokes] = useState([]); // [{type:'main'|'dot', points:[{x,y}]}]
+  const [userStrokes, setUserStrokes] = useState([]); // [{type:'main', points:[{x,y}]}]
   const [currentStroke, setCurrentStroke] = useState(null); // {points:[{x,y}]} while drawing
   const [drawing, setDrawing] = useState(false);
-  const [mode, setMode] = useState('main'); // 'main' | 'dots' | 'done'
+  const [mode, setMode] = useState('main'); // 'main' | 'done'
   const [score, setScore] = useState(null);
   const [canvasSize, setCanvasSize] = useState(350);
   const [autoPlayed, setAutoPlayed] = useState(false); // whether auto-speak succeeded
   const dpr = typeof window !== 'undefined' ? (window.devicePixelRatio || 1) : 1;
 
   const strokes = letter.strokes;
-  const mainStroke = strokes.find(s => s.type === 'main');
-  const dotStrokes = strokes.filter(s => s.type === 'dot');
-  const hasDots = dotStrokes.length > 0;
-  const expectedDotPositions = dotStrokes.flatMap(s => s.points);
+  // Memoize derived stroke data — recomputed only when the letter's strokes change
+  const mainStroke = useMemo(
+    () => letter.strokes.find(s => s.type === 'main'),
+    [letter.strokes]
+  );
+  const dotStrokes = useMemo(
+    () => letter.strokes.filter(s => s.type === 'dot'),
+    [letter.strokes]
+  );
+  const hasDots = useMemo(() => dotStrokes.length > 0, [dotStrokes]);
+  const expectedDotPositions = useMemo(
+    () => dotStrokes.flatMap(s => s.points),
+    [dotStrokes]
+  );
 
   // Responsive canvas size
   useEffect(() => {
@@ -107,19 +117,12 @@ export default function TracingCanvas({ letter, onComplete }) {
       ctx.fill();
     }
 
-    // Draw expected dot positions (faint targets)
+    // Draw the letter's dots as pre-filled reference marks — they are part of
+    // the letter reference itself, not interactive targets
     for (const dot of expectedDotPositions) {
       ctx.beginPath();
-      ctx.arc(dot.x * size, dot.y * size, size * 0.04, 0, Math.PI * 2);
-      ctx.strokeStyle = mode === 'dots' ? '#FFA726' : '#E0E0E0';
-      ctx.lineWidth = 2;
-      ctx.setLineDash([3, 3]);
-      ctx.stroke();
-      ctx.setLineDash([]);
-      // Small filled center
-      ctx.fillStyle = mode === 'dots' ? 'rgba(255,167,38,0.3)' : 'rgba(0,0,0,0.05)';
-      ctx.beginPath();
-      ctx.arc(dot.x * size, dot.y * size, 4, 0, Math.PI * 2);
+      ctx.arc(dot.x * size, dot.y * size, size * 0.035, 0, Math.PI * 2);
+      ctx.fillStyle = '#757575';
       ctx.fill();
     }
 
@@ -128,7 +131,7 @@ export default function TracingCanvas({ letter, onComplete }) {
       if (stroke.type === 'main' && stroke.points.length > 1) {
         ctx.beginPath();
         ctx.strokeStyle = '#2E7D32';
-        ctx.lineWidth = 5;
+        ctx.lineWidth = 8;
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
 
@@ -144,26 +147,11 @@ export default function TracingCanvas({ letter, onComplete }) {
       }
     }
 
-    // Draw user placed dots
-    for (const stroke of userStrokes) {
-      if (stroke.type === 'dot') {
-        for (const pt of stroke.points) {
-          ctx.beginPath();
-          ctx.arc(pt.x, pt.y, size * 0.03, 0, Math.PI * 2);
-          ctx.fillStyle = '#E65100';
-          ctx.fill();
-          ctx.strokeStyle = '#FFA726';
-          ctx.lineWidth = 2;
-          ctx.stroke();
-        }
-      }
-    }
-
     // Draw current stroke being drawn
     if (currentStroke && currentStroke.points.length > 1) {
       ctx.beginPath();
       ctx.strokeStyle = '#2E7D32';
-      ctx.lineWidth = 5;
+      ctx.lineWidth = 8;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
 
@@ -177,7 +165,7 @@ export default function TracingCanvas({ letter, onComplete }) {
       ctx.lineTo(pts[pts.length - 1].x, pts[pts.length - 1].y);
       ctx.stroke();
     }
-  }, [userStrokes, currentStroke, letter, canvasSize, mode, mainStroke, expectedDotPositions, dpr]);
+  }, [userStrokes, currentStroke, letter, canvasSize, mainStroke, expectedDotPositions, dpr]);
 
   const getPos = useCallback((e) => {
     const canvas = canvasRef.current;
@@ -201,13 +189,6 @@ export default function TracingCanvas({ letter, onComplete }) {
     if (mode === 'done') return;
     const pos = getPos(e);
     if (!pos) return;
-
-    if (mode === 'dots') {
-      // In dot mode, each click places a dot
-      const dotStroke = { type: 'dot', points: [pos] };
-      setUserStrokes(prev => [...prev, dotStroke]);
-      return;
-    }
 
     // Main stroke mode
     setDrawing(true);
@@ -237,12 +218,10 @@ export default function TracingCanvas({ letter, onComplete }) {
     setCurrentStroke(null);
   };
 
-  const switchToDots = () => {
-    setMode('dots');
-  };
-
   const checkScore = () => {
-    const result = scoreTrace(userStrokes, strokes, canvasSize);
+    // Dots are pre-rendered reference marks — score the main stroke only
+    const mainStrokesOnly = userStrokes.filter(s => s.type === 'main');
+    const result = scoreTrace(mainStrokesOnly, strokes, canvasSize);
     setScore(result);
     setMode('done');
   };
@@ -261,8 +240,6 @@ export default function TracingCanvas({ letter, onComplete }) {
   };
 
   const userMainStrokes = userStrokes.filter(s => s.type === 'main');
-  const userDotStrokes = userStrokes.filter(s => s.type === 'dot');
-  const userDotsPlaced = userDotStrokes.reduce((count, s) => count + s.points.length, 0);
   const mainDrawn = userMainStrokes.length > 0;
 
   return (
@@ -316,16 +293,13 @@ export default function TracingCanvas({ letter, onComplete }) {
       {/* Mode indicator / instructions */}
       <div style={styles.instructionBox}>
         {mode === 'main' && !mainDrawn && (
-          <p style={styles.hint}>Draw the main stroke following the dotted path</p>
-        )}
-        {mode === 'main' && mainDrawn && hasDots && (
-          <p style={{ ...styles.hint, color: '#E65100', fontWeight: 600 }}>
-            Main stroke drawn! Now tap to place the {expectedDotPositions.length} dot(s)
+          <p style={styles.hint}>
+            Draw the main stroke following the dotted path{hasDots ? ' — the dots are already drawn for you' : ''}
           </p>
         )}
-        {mode === 'dots' && (
-          <p style={{ ...styles.hint, color: '#E65100' }}>
-            Tap near the orange circles to place dots ({userDotsPlaced}/{expectedDotPositions.length} placed)
+        {mode === 'main' && mainDrawn && (
+          <p style={{ ...styles.hint, color: '#2E7D32', fontWeight: 600 }}>
+            Main stroke drawn! Tap "Check My Trace" to see your score
           </p>
         )}
         {mode === 'done' && score && (
@@ -347,7 +321,6 @@ export default function TracingCanvas({ letter, onComplete }) {
           </strong>
           <div style={styles.scoreBreakdown}>
             <span>Stroke: {score.mainScore}%</span>
-            {hasDots && <span>Dots: {score.dotScore}%</span>}
           </div>
           {score.total < 40 && <p style={{ color: '#E53935', fontSize: 13, margin: '4px 0 0' }}>Try again! Aim for at least 40%</p>}
         </div>
@@ -357,19 +330,7 @@ export default function TracingCanvas({ letter, onComplete }) {
       <div style={styles.btnRow}>
         <button onClick={clearCanvas} style={styles.clearBtn}>Clear & Retry</button>
 
-        {mode === 'main' && mainDrawn && hasDots && (
-          <button onClick={switchToDots} style={styles.dotsBtn}>
-            Place Dots ({expectedDotPositions.length})
-          </button>
-        )}
-
-        {mode === 'dots' && userDotsPlaced > 0 && (
-          <button onClick={checkScore} style={styles.checkBtn}>
-            Check My Trace
-          </button>
-        )}
-
-        {mode === 'main' && mainDrawn && !hasDots && (
+        {mode === 'main' && mainDrawn && (
           <button onClick={checkScore} style={styles.checkBtn}>
             Check My Trace
           </button>
@@ -485,16 +446,6 @@ const styles = {
     fontWeight: 600,
     cursor: 'pointer',
     color: '#666',
-    fontSize: 14,
-  },
-  dotsBtn: {
-    background: '#FFA726',
-    color: 'white',
-    border: 'none',
-    borderRadius: 8,
-    padding: '10px 18px',
-    fontWeight: 600,
-    cursor: 'pointer',
     fontSize: 14,
   },
   checkBtn: {

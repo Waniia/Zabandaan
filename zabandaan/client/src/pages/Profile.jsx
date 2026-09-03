@@ -76,11 +76,13 @@ export default function Profile() {
   if (!user) return null;
 
   const categories = [
-    { name: 'Alphabets', key: 'alphabets', diff: null, total: 10, icon: '✏️' },
+    { name: 'Alphabets', key: 'alphabets', diff: null, total: 39, icon: '✏️' },
+    { name: 'Numbers', key: 'numbers', diff: null, total: 10, icon: '🔢' },
     { name: 'Idioms (Easy)', key: 'idioms', diff: 'easy', total: 10, icon: '💬' },
     { name: 'Idioms (Hard)', key: 'idioms', diff: 'hard', total: 10, icon: '💬' },
     { name: 'Word Search (Easy)', key: 'wordsearch', diff: 'easy', total: 15, icon: '🔍' },
     { name: 'Word Search (Hard)', key: 'wordsearch', diff: 'hard', total: 10, icon: '🔍' },
+    { name: 'Adjectives', key: 'adjectives', diff: null, total: 15, icon: '🌟' },
     { name: 'Poetry', key: 'poetry', diff: null, total: 12, icon: '📜' },
   ];
 

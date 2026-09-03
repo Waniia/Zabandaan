@@ -5,6 +5,8 @@ import Login from './pages/Login';
 import Home from './pages/Home';
 import DifficultySelect from './pages/DifficultySelect';
 import AlphabetMap from './pages/alphabets/AlphabetMap';
+import NumberMap from './pages/numbers/NumberMap';
+import AdjectivesGame from './pages/adjectives/AdjectivesGame';
 import IdiomsGame from './pages/idioms/IdiomsGame';
 import WordSearchGame from './pages/wordsearch/WordSearchGame';
 import PoetryPage from './pages/poetry/PoetryPage';
@@ -43,6 +45,8 @@ function AppRoutes() {
       <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
       <Route path="/difficulty/:module" element={<ProtectedRoute><DifficultySelect /></ProtectedRoute>} />
       <Route path="/alphabets" element={<ProtectedRoute><AlphabetMap /></ProtectedRoute>} />
+      <Route path="/numbers" element={<ProtectedRoute><NumberMap /></ProtectedRoute>} />
+      <Route path="/adjectives" element={<ProtectedRoute><AdjectivesGame /></ProtectedRoute>} />
       <Route path="/idioms/:difficulty" element={<ProtectedRoute><IdiomsGame /></ProtectedRoute>} />
       <Route path="/wordsearch/:difficulty" element={<ProtectedRoute><WordSearchGame /></ProtectedRoute>} />
       <Route path="/poetry" element={<ProtectedRoute><PoetryPage /></ProtectedRoute>} />

@@ -98,6 +98,8 @@ function scoreDots(userDots, expectedDots, canvasSize) {
 
 /**
  * Score a complete trace with multi-stroke support
+ * When no user dot strokes are provided (dots pre-rendered as reference
+ * marks), the total is simply the main stroke score (100% weight).
  * @param {Array} userStrokes - Array of {type: 'main'|'dot', points: [{x,y}]}
  * @param {Array} referenceStrokes - Array of {type: 'main'|'dot', points: [{x,y}]}
  * @param {number} canvasSize - Canvas size in pixels
@@ -132,10 +134,14 @@ export function scoreTrace(userStrokes, referenceStrokes, canvasSize) {
   
   // Score dots
   const dotScore = scoreDots(userDotPositions, expectedDotPositions, canvasSize);
-  
-  // Combined: 70% main + 30% dots
-  const total = Math.round(mainScore * 0.7 + dotScore * 0.3);
-  
+
+  // Combined: 70% main + 30% dots — but only when the user actually placed
+  // dots. When dots are pre-rendered (no user dot strokes provided), the
+  // trace is scored 100% on the main stroke.
+  const total = userDotPositions.length > 0
+    ? Math.round(mainScore * 0.7 + dotScore * 0.3)
+    : mainScore;
+
   return { total, mainScore, dotScore };
 }
 

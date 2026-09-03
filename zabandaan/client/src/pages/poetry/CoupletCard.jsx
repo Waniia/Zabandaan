@@ -46,7 +46,7 @@ export default function CoupletCard({ couplet, onRead, isRead }) {
         className="urdu-text"
         style={styles.urduFull}
       >
-        {couplet.couplet_urdu.split('\n').map((line, i, arr) => (
+        {(couplet.couplet_urdu || '').split('\n').map((line, i, arr) => (
           <span key={i}>
             {line}
             {i < arr.length - 1 && <br />}
@@ -56,7 +56,7 @@ export default function CoupletCard({ couplet, onRead, isRead }) {
 
       {/* Roman transliteration */}
       <div style={styles.roman}>
-        {couplet.couplet_roman.split('\n').join(' — ')}
+        {(couplet.couplet_roman || '').split('\n').join(' — ')}
       </div>
 
       {/* Listen button */}

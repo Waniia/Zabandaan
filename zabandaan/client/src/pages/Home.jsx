@@ -29,11 +29,21 @@ export default function Home() {
     if (isGuest) {
       // Load from localStorage
       const p = {};
-      ['alphabets', 'idioms_easy', 'idioms_hard', 'wordsearch_easy', 'wordsearch_hard', 'poetry'].forEach(key => {
-        const stored = localStorage.getItem(`guest_progress_${key}`);
+      const guestKeyMap = [
+        { storageKey: 'alphabets_none', progressKey: 'alphabets' },
+        { storageKey: 'numbers_none', progressKey: 'numbers' },
+        { storageKey: 'idioms_easy', progressKey: 'idioms_easy' },
+        { storageKey: 'idioms_hard', progressKey: 'idioms_hard' },
+        { storageKey: 'wordsearch_easy', progressKey: 'wordsearch_easy' },
+        { storageKey: 'wordsearch_hard', progressKey: 'wordsearch_hard' },
+        { storageKey: 'adjectives_none', progressKey: 'adjectives' },
+        { storageKey: 'poetry_none', progressKey: 'poetry' },
+      ];
+      guestKeyMap.forEach(({ storageKey, progressKey }) => {
+        const stored = localStorage.getItem(`guest_progress_${storageKey}`);
         if (stored) {
           const data = JSON.parse(stored);
-          p[key] = (data.completed || []).length;
+          p[progressKey] = (data.completed || []).length;
         }
       });
       setProgress(p);
@@ -62,27 +72,39 @@ export default function Home() {
   const categories = [
     {
       id: 'alphabets', title: 'Alphabets', subtitle: 'Urdu Harf',
-      icon: '✏️', route: '/alphabets', total: 10, progressKey: 'alphabets', working: true
+      description: 'Trace and learn all 39 Urdu letters with guided stroke practice',
+      icon: '✏️', route: '/alphabets', total: 39, progressKey: 'alphabets', working: true,
+      accent: '#43A047', accentBg: '#E8F5E9',
     },
     {
       id: 'numbers', title: 'Numbers', subtitle: 'Urdu Adad',
-      icon: '🔢', working: false
+      description: 'Learn to read and write Urdu numerals ۱ through ۱۰',
+      icon: '🔢', route: '/numbers', total: 10, progressKey: 'numbers', working: true,
+      accent: '#1E88E5', accentBg: '#E3F2FD',
     },
     {
       id: 'idioms', title: 'Idioms', subtitle: 'Muhavare',
-      icon: '💬', route: '/difficulty/idioms', total: 10, progressKey: 'idioms', working: true
+      description: 'Match Urdu idioms to their meanings with picture clues',
+      icon: '💬', route: '/difficulty/idioms', total: 10, progressKey: 'idioms', working: true,
+      accent: '#FB8C00', accentBg: '#FFF3E0',
     },
     {
       id: 'wordsearch', title: 'Word Search', subtitle: 'Lafz Dhundo',
-      icon: '🔍', route: '/difficulty/wordsearch', total: 15, progressKey: 'wordsearch', working: true
+      description: 'Find hidden Urdu words in a letter grid puzzle',
+      icon: '🔍', route: '/difficulty/wordsearch', total: 15, progressKey: 'wordsearch', working: true,
+      accent: '#8E24AA', accentBg: '#F3E5F5',
     },
     {
       id: 'adjectives', title: 'Adjectives', subtitle: 'Sifaat',
-      icon: '🌟', working: false
+      description: 'Learn descriptive Urdu words by matching pictures to adjectives',
+      icon: '🌟', route: '/adjectives', total: 15, progressKey: 'adjectives', working: true,
+      accent: '#F4511E', accentBg: '#FBE9E7',
     },
     {
       id: 'poetry', title: 'Poetry', subtitle: 'Shairi',
-      icon: '📜', route: '/poetry', total: 12, progressKey: 'poetry', working: true
+      description: 'Explore classic Urdu poetry couplets and their meanings',
+      icon: '📜', route: '/poetry', total: 12, progressKey: 'poetry', working: true,
+      accent: '#6D4C41', accentBg: '#EFEBE9',
     },
   ];
 
@@ -111,15 +133,18 @@ export default function Home() {
               <div
                 key={cat.id}
                 onClick={() => navigate(cat.route)}
-                style={styles.card}
+                style={{ ...styles.card, borderLeft: `4px solid ${cat.accent}` }}
                 onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.12)'; }}
                 onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)'; }}
               >
-                <span style={styles.cardIcon}>{cat.icon}</span>
+                <div style={{ ...styles.iconBadge, background: cat.accentBg }}>
+                  <span style={styles.cardIcon}>{cat.icon}</span>
+                </div>
                 <h3 style={styles.cardTitle}>{cat.title}</h3>
                 <p style={styles.cardSub}>{cat.subtitle}</p>
+                <p style={styles.cardDesc}>{cat.description}</p>
                 <div style={styles.progressWrap}>
-                  <div style={{ ...styles.progressBar, width: `${getProgressPct(cat.progressKey, cat.total)}%` }} />
+                  <div style={{ ...styles.progressBar, width: `${getProgressPct(cat.progressKey, cat.total)}%`, background: `linear-gradient(90deg, ${cat.accent}88, ${cat.accent})` }} />
                 </div>
                 <span style={styles.progressLabel}>{getProgressPct(cat.progressKey, cat.total)}% complete</span>
               </div>
@@ -178,11 +203,19 @@ const styles = {
     flexDirection: 'column',
     alignItems: 'center',
     gap: 4,
-    minHeight: 160,
+    minHeight: 180,
+  },
+  iconBadge: {
+    width: 60,
+    height: 60,
+    borderRadius: '50%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 4,
   },
   cardIcon: {
-    fontSize: 40,
-    marginBottom: 4,
+    fontSize: 32,
   },
   cardTitle: {
     margin: 0,
@@ -195,6 +228,12 @@ const styles = {
     fontSize: 13,
     color: '#888',
     fontFamily: "'Noto Nastaliq Urdu', serif",
+  },
+  cardDesc: {
+    margin: '4px 0 0',
+    fontSize: 12,
+    color: '#AAA',
+    lineHeight: 1.4,
   },
   progressWrap: {
     width: '100%',
