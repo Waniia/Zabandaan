@@ -11,6 +11,7 @@ import IdiomsGame from './pages/idioms/IdiomsGame';
 import WordSearchGame from './pages/wordsearch/WordSearchGame';
 import PoetryPage from './pages/poetry/PoetryPage';
 import Profile from './pages/Profile';
+import { LanguageProvider } from './context/LanguageContext';
 import './styles/global.css';
 
 function ProtectedRoute({ children }) {
@@ -43,12 +44,14 @@ function AppRoutes() {
     <Routes>
       <Route path="/login" element={user ? <Navigate to="/" replace /> : <Login />} />
       <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+      <Route path="/difficulty/wordsearch" element={<Navigate to="/wordsearch" replace />} />
       <Route path="/difficulty/:module" element={<ProtectedRoute><DifficultySelect /></ProtectedRoute>} />
       <Route path="/alphabets" element={<ProtectedRoute><AlphabetMap /></ProtectedRoute>} />
       <Route path="/numbers" element={<ProtectedRoute><NumberMap /></ProtectedRoute>} />
       <Route path="/adjectives" element={<ProtectedRoute><AdjectivesGame /></ProtectedRoute>} />
       <Route path="/idioms/:difficulty" element={<ProtectedRoute><IdiomsGame /></ProtectedRoute>} />
-      <Route path="/wordsearch/:difficulty" element={<ProtectedRoute><WordSearchGame /></ProtectedRoute>} />
+      <Route path="/wordsearch" element={<ProtectedRoute><WordSearchGame /></ProtectedRoute>} />
+      <Route path="/wordsearch/custom" element={<ProtectedRoute><WordSearchGame /></ProtectedRoute>} />
       <Route path="/poetry" element={<ProtectedRoute><PoetryPage /></ProtectedRoute>} />
       <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
       <Route path="*" element={<Navigate to="/" replace />} />
@@ -60,9 +63,11 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <PointsProvider>
-          <AppRoutes />
-        </PointsProvider>
+        <LanguageProvider>
+          <PointsProvider>
+            <AppRoutes />
+          </PointsProvider>
+        </LanguageProvider>
       </AuthProvider>
     </BrowserRouter>
   );

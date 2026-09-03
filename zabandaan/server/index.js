@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const { PORT } = require('./config');
 
 // Initialize database (runs schema on import)
 require('./db');
@@ -10,8 +11,6 @@ const progressRoutes = require('./routes/progress');
 const contentRoutes = require('./routes/content');
 
 const app = express();
-const PORT = 3001;
-
 app.use(cors());
 app.use(express.json());
 

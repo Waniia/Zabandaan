@@ -1,19 +1,23 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import api from '../../api';
 import Navbar from '../../components/Navbar';
 import SpeakerIcon from '../../components/SpeakerIcon';
 import { usePoints } from '../../context/PointsContext';
 import { generateGrid, checkSelection } from '../../utils/wordsearch';
 import WordSearchGrid from './WordSearchGrid';
-import DemoPanel from './DemoPanel';
 
 export default function WordSearchGame() {
-  const { difficulty } = useParams();
+  const location = useLocation();
   const navigate = useNavigate();
   const { addPoints } = usePoints();
 
   const [words, setWords] = useState([]);
+  const [mode, setMode] = useState(location.pathname.endsWith('/custom') ? 'custom' : 'choice');
+  const [customInput, setCustomInput] = useState('');
+  const [customError, setCustomError] = useState(null);
+  const [poolIndex, setPoolIndex] = useState(0);
+  const [completedPool, setCompletedPool] = useState([]);
   const [grid, setGrid] = useState(null);
   const [placements, setPlacements] = useState([]);
   const [foundWords, setFoundWords] = useState([]); // array of { word, meaning, cells, direction }
@@ -21,23 +25,30 @@ export default function WordSearchGame() {
   const [error, setError] = useState(null);
   const [lastFound, setLastFound] = useState(null); // most recently found word info
 
-  const gridSize = difficulty === 'hard' ? 12 : 10;
+  const gridSize = 10;
 
-  // Fetch words and generate grid on mount
+  const makePuzzle = useCallback((pool, startIndex) => {
+    const batch = pool.slice(startIndex, startIndex + 5);
+    const result = generateGrid(batch, gridSize);
+    setGrid(result.grid);
+    setPlacements(result.placements);
+    setFoundWords([]);
+    setLastFound(null);
+  }, []);
+
+  // Load the built-in pool only after the learner chooses Start.
   useEffect(() => {
+    if (mode !== 'builtin') return undefined;
     let cancelled = false;
     setLoading(true);
-    api.get('/content/wordsearch/' + difficulty)
+    api.get('/content/wordsearch/all')
       .then(res => {
         if (cancelled) return;
-        const data = res.data.words || [];
+        const data = [...(res.data.words || [])].sort(() => Math.random() - 0.5);
         setWords(data);
-        // Generate the grid
-        const result = generateGrid(data, gridSize);
-        setGrid(result.grid);
-        setPlacements(result.placements);
-        setFoundWords([]);
-        setLastFound(null);
+        setPoolIndex(0);
+        setCompletedPool([]);
+        makePuzzle(data, 0);
         setLoading(false);
       })
       .catch(err => {
@@ -47,7 +58,18 @@ export default function WordSearchGame() {
         setLoading(false);
       });
     return () => { cancelled = true; };
-  }, [difficulty, gridSize]);
+  }, [mode, makePuzzle]);
+
+  useEffect(() => {
+    if (mode !== 'custom') return;
+    const customWords = location.state?.words || [];
+    if (customWords.length > 0) {
+      setWords(customWords);
+      setPoolIndex(0);
+      makePuzzle(customWords, 0);
+      setLoading(false);
+    }
+  }, [mode, location.state, makePuzzle]);
 
   const handleSelect = useCallback((startCell, endCell) => {
     if (!grid || placements.length === 0) return;
@@ -63,27 +85,113 @@ export default function WordSearchGame() {
       const newFound = {
         word: result.placement.word,
         meaning: result.placement.meaning,
+        audio_path: result.placement.audio_path,
         cells: result.cells,
         direction: result.placement.direction,
       };
 
       setFoundWords(prev => [...prev, newFound]);
       setLastFound(newFound);
-      addPoints('wordsearch', difficulty, result.placement.word);
+      addPoints('wordsearch', 'custom', result.placement.word);
 
       // Clear last found highlight after 2 seconds
       setTimeout(() => setLastFound(null), 2000);
     }
-  }, [grid, placements, foundWords, addPoints, difficulty]);
+  }, [grid, placements, foundWords, addPoints]);
 
   const regeneratePuzzle = useCallback(() => {
-    if (words.length === 0) return;
-    const result = generateGrid(words, gridSize);
-    setGrid(result.grid);
-    setPlacements(result.placements);
+    if (mode === 'custom') {
+      const shuffledWords = [...words].sort(() => Math.random() - 0.5);
+      setWords(shuffledWords);
+      setPoolIndex(0);
+      setCompletedPool([]);
+      makePuzzle(shuffledWords, 0);
+      return;
+    }
+    const nextIndex = poolIndex + placements.length;
+    setCompletedPool(prev => [...prev, ...placements.map(p => p.word)]);
+    setPoolIndex(nextIndex);
+    makePuzzle(words, nextIndex);
+  }, [mode, poolIndex, placements, words, makePuzzle]);
+
+  const startCustom = () => {
+    const values = customInput.split(/[\n,]+/).map(word => word.trim()).filter(Boolean);
+    const unique = [...new Set(values)];
+    if (unique.length === 0) {
+      setCustomError('Enter at least one word.');
+      return;
+    }
+    if (unique.length > 10) {
+      setCustomError('You can add up to 10 words at a time.');
+      return;
+    }
+    setCustomError(null);
+    const customWords = unique
+      .map((word, index) => ({ word_urdu: word, word_meaning: '', id: `custom-${index}` }))
+      .sort(() => Math.random() - 0.5);
+    navigate('/wordsearch/custom', {
+      replace: true,
+      state: { words: customWords },
+    });
+    setMode('custom');
+    setWords(customWords);
+    setPoolIndex(0);
+    setCompletedPool([]);
+    makePuzzle(customWords, 0);
+    setLoading(false);
+  };
+
+  const createNewCustomWords = () => {
+    navigate('/wordsearch/custom', { replace: true, state: null });
+    setWords([]);
+    setGrid(null);
+    setPlacements([]);
     setFoundWords([]);
-    setLastFound(null);
-  }, [words, gridSize]);
+    setCustomInput('');
+    setCustomError(null);
+    setMode('custom');
+  };
+
+  const allFound = foundWords.length === placements.length && placements.length > 0;
+  const completedAll = allFound && poolIndex + placements.length >= words.length;
+
+  useEffect(() => {
+    if (!allFound || completedAll) return undefined;
+    const timer = setTimeout(regeneratePuzzle, 1200);
+    return () => clearTimeout(timer);
+  }, [allFound, completedAll, regeneratePuzzle]);
+
+  if (mode === 'choice') {
+    return (
+      <>
+        <Navbar />
+        <div style={styles.center}>
+          <h1 style={{ color: '#2E7D32' }}>Word Search</h1>
+          <p>Choose how you want to play.</p>
+          <div style={styles.choiceRow}>
+            <button style={styles.primaryBtn} onClick={() => setMode('builtin')}>Start Word Search</button>
+            <button style={styles.secondaryBtn} onClick={createNewCustomWords}>Create Your Own</button>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  if (mode === 'custom' && words.length === 0) {
+    return (
+      <>
+        <Navbar />
+        <div style={styles.center}>
+          <h2>Create Your Own Word Search</h2>
+          <p>Enter up to 10 Urdu words, one per line or separated by commas.</p>
+          <textarea value={customInput} onChange={e => setCustomInput(e.target.value)} rows={8} maxLength={300} style={styles.customInput} />
+          {customError && <p style={{ color: '#E53935' }}>{customError}</p>}
+          <button style={styles.primaryBtn} onClick={startCustom}>Create Puzzle</button>
+          <button style={styles.backBtn} onClick={() => setMode('choice')}>Back</button>
+        </div>
+      </>
+    );
+  }
 
   // --- Loading ---
   if (loading) {
@@ -112,7 +220,6 @@ export default function WordSearchGame() {
   }
 
   const foundWordSet = new Set(foundWords.map(fw => fw.word));
-  const allFound = foundWords.length === placements.length && placements.length > 0;
 
   return (
     <>
@@ -125,9 +232,7 @@ export default function WordSearchGame() {
           </button>
           <h2 style={styles.title}>
             Word Search
-            <span style={styles.diffBadge}>
-              {difficulty === 'hard' ? 'Hard' : 'Easy'}
-            </span>
+            <span style={styles.diffBadge}>Puzzle {Math.floor(poolIndex / 5) + 1}</span>
           </h2>
           <button style={styles.regenBtn} onClick={regeneratePuzzle}>
             🔀 Shuffle
@@ -140,7 +245,9 @@ export default function WordSearchGame() {
             {lastFound.meaning && (
               <span style={styles.foundMeaning}> — {lastFound.meaning}</span>
             )}
-            <SpeakerIcon text={lastFound.word} size={18} />
+            {mode !== 'custom' && (
+              <SpeakerIcon text={lastFound.word} size={18} audioUrl={lastFound.audio_path} />
+            )}
           </div>
         )}
 
@@ -152,11 +259,18 @@ export default function WordSearchGame() {
               All Words Found!
             </h3>
             <p style={{ color: '#666', margin: '0 0 12px', fontSize: 14 }}>
-              You found all {placements.length} words!
+              {completedAll ? `You found all ${words.length} words!` : `You found all ${placements.length} words!`}
             </p>
-            <button style={styles.primaryBtn} onClick={regeneratePuzzle}>
-              Play Again
-            </button>
+            {completedAll ? (
+              <div style={styles.choiceRow}>
+                {mode === 'custom' ? (
+                  <button style={styles.primaryBtn} onClick={createNewCustomWords}>Create New Words</button>
+                ) : (
+                  <button style={styles.primaryBtn} onClick={() => { setMode('choice'); setWords([]); setGrid(null); }}>Play Again</button>
+                )}
+                <button style={styles.secondaryBtn} onClick={() => navigate('/')}>Go Home</button>
+              </div>
+            ) : <p style={{ color: '#2E7D32', margin: 0 }}>Generating your next puzzle...</p>}
           </div>
         )}
 
@@ -199,7 +313,9 @@ export default function WordSearchGame() {
                     >
                       {p.word}
                     </span>
-                    <SpeakerIcon text={p.word} size={16} />
+                    {mode !== 'custom' && (
+                      <SpeakerIcon text={p.word} size={16} audioUrl={p.audio_path} />
+                    )}
                   </div>
                   {isFound && (
                     <div style={styles.wordMeaningRow}>
@@ -213,8 +329,6 @@ export default function WordSearchGame() {
           </div>
         </div>
 
-        {/* Demo panel */}
-        <DemoPanel />
       </div>
     </>
   );
@@ -324,6 +438,33 @@ const styles = {
     fontSize: 15,
     fontWeight: 600,
     cursor: 'pointer',
+  },
+  secondaryBtn: {
+    background: '#FFF3E0',
+    color: '#E65100',
+    border: '2px solid #FFB74D',
+    borderRadius: 10,
+    padding: '10px 24px',
+    fontSize: 15,
+    fontWeight: 600,
+    cursor: 'pointer',
+  },
+  choiceRow: {
+    display: 'flex',
+    gap: 12,
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+    marginTop: 16,
+  },
+  customInput: {
+    width: 'min(100%, 420px)',
+    padding: 12,
+    border: '2px solid #E0E0E0',
+    borderRadius: 10,
+    fontSize: 18,
+    resize: 'vertical',
+    fontFamily: "'Noto Nastaliq Urdu', serif",
+    direction: 'rtl',
   },
   backBtn: {
     background: 'none',

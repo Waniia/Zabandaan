@@ -492,7 +492,7 @@ export const alphabets = [
     nameUrdu: 'دال',
     exampleWord: 'دروازہ',
     exampleWordEnglish: 'Door',
-    imagePath: null,
+    imagePath: '/images/alphabets/generated/daal.svg',
     audioPath: null,
     wordAudioPath: null,
     strokes: [
@@ -506,7 +506,7 @@ export const alphabets = [
     nameUrdu: 'ڈال',
     exampleWord: 'ڈھول',
     exampleWordEnglish: 'Drum',
-    imagePath: null,
+    imagePath: '/images/alphabets/generated/ddaal.svg',
     audioPath: null,
     wordAudioPath: null,
     strokes: [
@@ -521,7 +521,7 @@ export const alphabets = [
     nameUrdu: 'ذال',
     exampleWord: 'ذوق',
     exampleWordEnglish: 'Interest',
-    imagePath: null,
+    imagePath: '/images/alphabets/generated/zaal.svg',
     audioPath: null,
     wordAudioPath: null,
     strokes: [
@@ -536,7 +536,7 @@ export const alphabets = [
     nameUrdu: 'رے',
     exampleWord: 'روٹی',
     exampleWordEnglish: 'Bread',
-    imagePath: null,
+    imagePath: '/images/alphabets/generated/ray.svg',
     audioPath: null,
     wordAudioPath: null,
     strokes: [
@@ -550,7 +550,7 @@ export const alphabets = [
     nameUrdu: 'ڑے',
     exampleWord: 'پہاڑ',
     exampleWordEnglish: 'Mountain',
-    imagePath: null,
+    imagePath: '/images/alphabets/generated/rray.svg',
     audioPath: null,
     wordAudioPath: null,
     strokes: [
@@ -565,7 +565,7 @@ export const alphabets = [
     nameUrdu: 'زے',
     exampleWord: 'زمین',
     exampleWordEnglish: 'Earth',
-    imagePath: null,
+    imagePath: '/images/alphabets/generated/zay.svg',
     audioPath: null,
     wordAudioPath: null,
     strokes: [
@@ -580,7 +580,7 @@ export const alphabets = [
     nameUrdu: 'ژے',
     exampleWord: 'ژالہ',
     exampleWordEnglish: 'Hailstone',
-    imagePath: null,
+    imagePath: '/images/alphabets/generated/zhay.svg',
     audioPath: null,
     wordAudioPath: null,
     strokes: [
@@ -599,7 +599,7 @@ export const alphabets = [
     nameUrdu: 'سین',
     exampleWord: 'سیب',
     exampleWordEnglish: 'Apple',
-    imagePath: null,
+    imagePath: '/images/alphabets/generated/seen.svg',
     audioPath: null,
     wordAudioPath: null,
     strokes: [
@@ -613,7 +613,7 @@ export const alphabets = [
     nameUrdu: 'شین',
     exampleWord: 'شیر',
     exampleWordEnglish: 'Lion',
-    imagePath: null,
+    imagePath: '/images/alphabets/generated/sheen.svg',
     audioPath: null,
     wordAudioPath: null,
     strokes: [
@@ -632,7 +632,7 @@ export const alphabets = [
     nameUrdu: 'صاد',
     exampleWord: 'صابن',
     exampleWordEnglish: 'Soap',
-    imagePath: null,
+    imagePath: '/images/alphabets/generated/suad.svg',
     audioPath: null,
     wordAudioPath: null,
     strokes: [
@@ -646,7 +646,7 @@ export const alphabets = [
     nameUrdu: 'ضاد',
     exampleWord: 'ضرب',
     exampleWordEnglish: 'Multiplication',
-    imagePath: null,
+    imagePath: '/images/alphabets/generated/zuad.svg',
     audioPath: null,
     wordAudioPath: null,
     strokes: [
@@ -661,7 +661,7 @@ export const alphabets = [
     nameUrdu: 'طوئے',
     exampleWord: 'طوطا',
     exampleWordEnglish: 'Parrot',
-    imagePath: null,
+    imagePath: '/images/alphabets/generated/toe.svg',
     audioPath: null,
     wordAudioPath: null,
     strokes: [
@@ -675,7 +675,7 @@ export const alphabets = [
     nameUrdu: 'ظوئے',
     exampleWord: 'ظالم',
     exampleWordEnglish: 'Tyrant',
-    imagePath: null,
+    imagePath: '/images/alphabets/generated/zoe.svg',
     audioPath: null,
     wordAudioPath: null,
     strokes: [
@@ -690,7 +690,7 @@ export const alphabets = [
     nameUrdu: 'عین',
     exampleWord: 'عینک',
     exampleWordEnglish: 'Glasses',
-    imagePath: null,
+    imagePath: '/images/alphabets/generated/ain.svg',
     audioPath: null,
     wordAudioPath: null,
     strokes: [
@@ -704,7 +704,7 @@ export const alphabets = [
     nameUrdu: 'غین',
     exampleWord: 'غبارہ',
     exampleWordEnglish: 'Balloon',
-    imagePath: null,
+    imagePath: '/images/alphabets/generated/ghain.svg',
     audioPath: null,
     wordAudioPath: null,
     strokes: [
@@ -719,7 +719,7 @@ export const alphabets = [
     nameUrdu: 'فے',
     exampleWord: 'فیل',
     exampleWordEnglish: 'Elephant',
-    imagePath: null,
+    imagePath: '/images/alphabets/generated/fay.svg',
     audioPath: null,
     wordAudioPath: null,
     strokes: [
@@ -734,7 +734,7 @@ export const alphabets = [
     nameUrdu: 'قاف',
     exampleWord: 'قلم',
     exampleWordEnglish: 'Pen',
-    imagePath: null,
+    imagePath: '/images/alphabets/generated/qaaf.svg',
     audioPath: null,
     wordAudioPath: null,
     strokes: [
@@ -752,7 +752,7 @@ export const alphabets = [
     nameUrdu: 'کاف',
     exampleWord: 'کھلونا',
     exampleWordEnglish: 'Toy',
-    imagePath: null,
+    imagePath: '/images/alphabets/generated/kaaf.svg',
     audioPath: null,
     wordAudioPath: null,
     strokes: [
@@ -766,7 +766,7 @@ export const alphabets = [
     nameUrdu: 'گاف',
     exampleWord: 'گاڑی',
     exampleWordEnglish: 'Car',
-    imagePath: null,
+    imagePath: '/images/alphabets/generated/gaaf.svg',
     audioPath: null,
     wordAudioPath: null,
     strokes: [
@@ -781,7 +781,7 @@ export const alphabets = [
     nameUrdu: 'لام',
     exampleWord: 'لیموں',
     exampleWordEnglish: 'Lemon',
-    imagePath: null,
+    imagePath: '/images/alphabets/generated/laam.svg',
     audioPath: null,
     wordAudioPath: null,
     strokes: [
@@ -795,7 +795,7 @@ export const alphabets = [
     nameUrdu: 'میم',
     exampleWord: 'مچھلی',
     exampleWordEnglish: 'Fish',
-    imagePath: null,
+    imagePath: '/images/alphabets/generated/meem.svg',
     audioPath: null,
     wordAudioPath: null,
     strokes: [
@@ -809,7 +809,7 @@ export const alphabets = [
     nameUrdu: 'نون',
     exampleWord: 'نارنگی',
     exampleWordEnglish: 'Orange',
-    imagePath: null,
+    imagePath: '/images/alphabets/generated/noon.svg',
     audioPath: null,
     wordAudioPath: null,
     strokes: [
@@ -824,7 +824,7 @@ export const alphabets = [
     nameUrdu: 'نون غنہ',
     exampleWord: 'ماں',
     exampleWordEnglish: 'Mother',
-    imagePath: null,
+    imagePath: '/images/alphabets/generated/noon-ghunna-maa.png',
     audioPath: null,
     wordAudioPath: null,
     strokes: [
@@ -838,7 +838,7 @@ export const alphabets = [
     nameUrdu: 'واؤ',
     exampleWord: 'وزیر',
     exampleWordEnglish: 'Minister',
-    imagePath: null,
+    imagePath: '/images/alphabets/generated/wao-wazir.png',
     audioPath: null,
     wordAudioPath: null,
     strokes: [
@@ -852,7 +852,7 @@ export const alphabets = [
     nameUrdu: 'ہے',
     exampleWord: 'ہاتھی',
     exampleWordEnglish: 'Elephant',
-    imagePath: null,
+    imagePath: '/images/alphabets/generated/choti-hay.svg',
     audioPath: null,
     wordAudioPath: null,
     strokes: [
@@ -866,7 +866,7 @@ export const alphabets = [
     nameUrdu: 'دو چشمی ہے',
     exampleWord: 'پھول',
     exampleWordEnglish: 'Flower',
-    imagePath: null,
+    imagePath: '/images/alphabets/generated/do-chashmi-hay.svg',
     audioPath: null,
     wordAudioPath: null,
     strokes: [
@@ -880,7 +880,7 @@ export const alphabets = [
     nameUrdu: 'ہمزہ',
     exampleWord: 'سوئی',
     exampleWordEnglish: 'Needle',
-    imagePath: null,
+    imagePath: '/images/alphabets/generated/hamza.svg',
     audioPath: null,
     wordAudioPath: null,
     strokes: [
@@ -892,9 +892,9 @@ export const alphabets = [
     letter: 'ی',
     name: 'Chhoti Ye',
     nameUrdu: 'یے',
-    exampleWord: 'یاد',
-    exampleWordEnglish: 'Memory',
-    imagePath: null,
+    exampleWord: 'یاقوت',
+    exampleWordEnglish: 'Ruby',
+    imagePath: '/images/alphabets/generated/chhoti-ye.svg',
     audioPath: null,
     wordAudioPath: null,
     strokes: [
@@ -910,9 +910,9 @@ export const alphabets = [
     letter: 'ے',
     name: 'Bari Ye',
     nameUrdu: 'بڑی یے',
-    exampleWord: 'چائے',
-    exampleWordEnglish: 'Tea',
-    imagePath: null,
+    exampleWord: 'گائے',
+    exampleWordEnglish: 'Cow',
+    imagePath: '/images/alphabets/generated/bari-ye.svg',
     audioPath: null,
     wordAudioPath: null,
     strokes: [

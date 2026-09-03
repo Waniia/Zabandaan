@@ -1,10 +1,8 @@
 import { useState, useCallback } from 'react';
 import SpeakerIcon from '../../components/SpeakerIcon';
-import { speak } from '../../utils/speech';
 
 export default function CoupletCard({ couplet, onRead, isRead }) {
   const [selectedWord, setSelectedWord] = useState(null);
-  const [listening, setListening] = useState(false);
 
   const handleWordClick = useCallback((wordObj, idx) => {
     if (selectedWord && selectedWord.idx === idx) {
@@ -13,14 +11,6 @@ export default function CoupletCard({ couplet, onRead, isRead }) {
       setSelectedWord({ ...wordObj, idx });
     }
   }, [selectedWord]);
-
-  const handleListenFull = useCallback(async () => {
-    setListening(true);
-    try {
-      await speak(couplet.couplet_urdu);
-    } catch { /* ignore */ }
-    setListening(false);
-  }, [couplet.couplet_urdu]);
 
   const handleRead = useCallback(() => {
     if (onRead) onRead(couplet);
@@ -60,17 +50,12 @@ export default function CoupletCard({ couplet, onRead, isRead }) {
       </div>
 
       {/* Listen button */}
-      <button
-        style={{
-          ...styles.listenBtn,
-          opacity: listening ? 0.7 : 1,
-        }}
-        onClick={handleListenFull}
-        disabled={listening}
-      >
-        {listening ? 'Speaking...' : 'Listen to Full Couplet'}
-        <SpeakerIcon text={couplet.couplet_urdu} size={18} style={{ marginLeft: 8 }} />
-      </button>
+      <SpeakerIcon
+        text={couplet.couplet_urdu}
+        size={18}
+        audioUrl={couplet.audio_path}
+        style={styles.listenBtn}
+      />
 
       {/* English Paraphrase section */}
       <div style={styles.meaningSection}>
@@ -113,7 +98,12 @@ export default function CoupletCard({ couplet, onRead, isRead }) {
                 >
                   {w.word_urdu}
                 </span>
-                <SpeakerIcon text={w.word_urdu} size={12} style={{ padding: 2 }} />
+                <SpeakerIcon
+                  text={w.word_urdu}
+                  size={12}
+                  audioUrl={w.audio_path || `/audio/poetry/${couplet.id}-word-${idx}.mp3`}
+                  style={{ padding: 2 }}
+                />
               </span>
             ))}
           </div>

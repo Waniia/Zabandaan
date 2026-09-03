@@ -21,12 +21,13 @@ export default function SpeakerIcon({ text, size = 20, style = {}, audioUrl }) {
     setState('loading');
 
     try {
-      const result = await speak(text, 'ur-PK', { audioUrl });
+      await speak(text, 'ur-PK', { audioUrl });
       // Only reset if this call is still the latest
       if (callRef.current === callId) {
         setState('idle');
       }
-    } catch {
+    } catch (error) {
+      console.warn('Speech playback failed:', error);
       if (callRef.current === callId) {
         setState('idle');
       }
@@ -42,6 +43,7 @@ export default function SpeakerIcon({ text, size = 20, style = {}, audioUrl }) {
 
   return (
     <button
+      type="button"
       onClick={handleClick}
       style={{
         background: 'none',
@@ -59,6 +61,7 @@ export default function SpeakerIcon({ text, size = 20, style = {}, audioUrl }) {
       }}
       title={`Listen: ${text}`}
       aria-label={`Play pronunciation of ${text}`}
+      aria-busy={showState !== 'idle'}
     >
       {icon}
     </button>

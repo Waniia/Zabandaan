@@ -4,11 +4,16 @@
   "description": "Gamified Urdu-literacy web app",
   "private": true,
   "scripts": {
+    "install:all": "npm install && cd client && npm install && cd ../server && npm install",
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
     "dev:server": "cd server && node index.js",
     "dev:client": "cd client && npx vite --host",
     "build": "cd client && npx vite build",
+    "seed": "cd server && npm run seed",
     "start": "npm run dev"
+  },
+  "engines": {
+    "node": ">=22"
   },
   "dependencies": {
     "concurrently": "^10.0.5"

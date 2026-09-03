@@ -77,6 +77,7 @@ export function generateGrid(words, gridSize = 10) {
         placements.push({
           word: wordObj.word_urdu,
           meaning: wordObj.word_meaning,
+          audio_path: wordObj.audio_path,
           direction: dir.name,
           cells,
           startRow,

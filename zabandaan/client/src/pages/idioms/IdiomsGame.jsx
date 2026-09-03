@@ -55,10 +55,10 @@ export default function IdiomsGame() {
     const idiom = idioms[currentIndex];
     if (!idiom) return;
     const opts = shuffleArray([
-      idiom.correct_meaning,
-      idiom.distractor_1,
-      idiom.distractor_2,
-      idiom.distractor_3,
+      idiom.correct_option,
+      idiom.distractor_1_option,
+      idiom.distractor_2_option,
+      idiom.distractor_3_option,
     ]);
     setOptions(opts);
     setSelected(null);
@@ -72,7 +72,7 @@ export default function IdiomsGame() {
     if (!currentIdiom) return;
     setSelected(option);
 
-    const isCorrect = option === currentIdiom.correct_meaning;
+    const isCorrect = option.english === currentIdiom.correct_option.english;
     if (isCorrect) {
       setFeedback('correct');
       addPoints('idioms', difficulty, currentIdiom.id);
@@ -137,7 +137,7 @@ export default function IdiomsGame() {
             <span style={{ fontSize: 56 }}>🎉</span>
             <h2 style={{ margin: '12px 0 4px', color: '#2E7D32' }}>Quiz Complete!</h2>
             <p style={{ color: '#666', fontSize: 15, margin: '0 0 20px' }}>
-              You finished all {idioms.length} idioms ({difficulty} mode)
+              You finished all {idioms.length} idioms (Level {difficulty.replace('level-', '')})
             </p>
             <div style={{ display: 'flex', gap: 12 }}>
               <button style={styles.primaryBtn} onClick={restartQuiz}>Play Again</button>
@@ -165,7 +165,7 @@ export default function IdiomsGame() {
             ← Back
           </button>
           <span style={styles.progress}>
-            Question {questionNum} of {totalQuestions}
+            Level {difficulty.replace('level-', '')} · Question {questionNum} of {totalQuestions}
           </span>
         </div>
 
@@ -195,7 +195,11 @@ export default function IdiomsGame() {
             <span className="urdu-text" style={styles.urduText}>
               {currentIdiom.idiom_urdu}
             </span>
-            <SpeakerIcon text={currentIdiom.idiom_urdu} size={24} />
+            <SpeakerIcon
+              text={currentIdiom.idiom_urdu}
+              size={24}
+              audioUrl={currentIdiom.audio_path || `/audio/idioms/${currentIdiom.id}.mp3`}
+            />
           </div>
 
           <p style={styles.roman}>{currentIdiom.idiom_roman}</p>
@@ -217,11 +221,11 @@ export default function IdiomsGame() {
               let color = '#333';
 
               if (selected !== null) {
-                if (opt === currentIdiom.correct_meaning) {
+                if (opt.english === currentIdiom.correct_option.english) {
                   bg = '#C8E6C9';
                   border = '#2E7D32';
                   color = '#1B5E20';
-                } else if (opt === selected && opt !== currentIdiom.correct_meaning) {
+                } else if (opt.english === selected.english && opt.english !== currentIdiom.correct_option.english) {
                   bg = '#FFCDD2';
                   border = '#E53935';
                   color = '#B71C1C';
@@ -241,7 +245,7 @@ export default function IdiomsGame() {
                     borderColor: border,
                     color,
                     cursor: selected !== null ? 'default' : 'pointer',
-                    opacity: selected !== null && opt !== selected && opt !== currentIdiom.correct_meaning ? 0.6 : 1,
+                    opacity: selected !== null && opt.english !== selected.english && opt.english !== currentIdiom.correct_option.english ? 0.6 : 1,
                   }}
                   onClick={() => handleSelect(opt)}
                   disabled={selected !== null}
@@ -249,7 +253,10 @@ export default function IdiomsGame() {
                   <span style={styles.optionLetter}>
                     {String.fromCharCode(65 + idx)}.
                   </span>
-                  {opt}
+                  <span>
+                    <strong className="urdu-text" style={styles.optionUrdu}>{opt.urdu}</strong>
+                    <span style={styles.optionEnglish}>{opt.english}</span>
+                  </span>
                 </button>
               );
             })}
@@ -412,6 +419,18 @@ const styles = {
     fontWeight: 700,
     fontSize: 14,
     minWidth: 20,
+  },
+  optionUrdu: {
+    display: 'block',
+    fontSize: 21,
+    direction: 'rtl',
+    textAlign: 'right',
+    marginBottom: 2,
+  },
+  optionEnglish: {
+    display: 'block',
+    fontSize: 14,
+    color: '#666',
   },
   doneCard: {
     textAlign: 'center',

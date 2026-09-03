@@ -131,7 +131,11 @@ export default function NumberMap() {
               >
                 <span style={styles.numberChar} className="urdu-text">{number.letter}</span>
                 <div style={styles.nameRow}>
-                  <SpeakerIcon text={number.nameUrdu} size={14} audioUrl={number.audioPath} />
+                  <SpeakerIcon
+                    text={number.nameUrdu}
+                    size={14}
+                    audioUrl={number.audioPath || `/audio/numbers/${number.id}.mp3`}
+                  />
                   <span style={styles.numberName}>{number.name}</span>
                 </div>
                 {number.exampleWord && (

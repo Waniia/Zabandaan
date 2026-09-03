@@ -132,7 +132,11 @@ export default function AlphabetMap() {
               >
                 <span style={styles.letterChar} className="urdu-text">{letter.letter}</span>
                 <div style={styles.nameRow}>
-                  <SpeakerIcon text={letter.nameUrdu} size={14} audioUrl={letter.audioPath} />
+                  <SpeakerIcon
+                    text={letter.nameUrdu}
+                    size={14}
+                    audioUrl={letter.audioPath || `/audio/alphabets/${letter.id}.mp3`}
+                  />
                   <span style={styles.letterName}>{letter.name}</span>
                 </div>
                 {letter.imagePath && (
@@ -228,8 +232,8 @@ const styles = {
     gap: 2,
   },
   letterImage: {
-    width: 48,
-    height: 48,
+    width: 96,
+    height: 96,
     borderRadius: 8,
     objectFit: 'cover',
     marginTop: 4,

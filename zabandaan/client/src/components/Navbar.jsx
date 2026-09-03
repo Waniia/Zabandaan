@@ -3,11 +3,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { usePoints } from '../context/PointsContext';
 import PointsBadge from './PointsBadge';
+import LanguageToggle from './LanguageToggle';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function Navbar() {
   const { user, isGuest, logout } = useAuth();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const { t } = useLanguage();
 
   const handleLogout = () => {
     logout();
@@ -23,6 +26,7 @@ export default function Navbar() {
         </Link>
 
         <PointsBadge />
+        <LanguageToggle compact />
 
         <button style={styles.hamburger} onClick={() => setMenuOpen(!menuOpen)}>
           {menuOpen ? '✕' : '☰'}
@@ -32,15 +36,15 @@ export default function Navbar() {
           ...styles.links,
           ...(menuOpen ? styles.linksOpen : {})
         }}>
-          <Link to="/" style={styles.link} onClick={() => setMenuOpen(false)}>Home</Link>
-          <Link to="/profile" style={styles.link} onClick={() => setMenuOpen(false)}>Profile</Link>
+          <Link to="/" style={styles.link} onClick={() => setMenuOpen(false)}>{t('home', 'Home')}</Link>
+          <Link to="/profile" style={styles.link} onClick={() => setMenuOpen(false)}>{t('profile', 'Profile')}</Link>
           {isGuest ? (
             <Link to="/profile" style={{ ...styles.link, ...styles.saveBtn }} onClick={() => setMenuOpen(false)}>
-              Save Progress
+              {t('saveProgress', 'Save Progress')}
             </Link>
           ) : (
             <button style={styles.logoutBtn} onClick={() => { setMenuOpen(false); handleLogout(); }}>
-              Logout
+              {t('logout', 'Logout')}
             </button>
           )}
         </div>
@@ -51,19 +55,20 @@ export default function Navbar() {
 
 const styles = {
   nav: {
-    background: 'white',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+    background: '#fffdf7',
+    borderBottom: '1px solid #dfd5be',
+    boxShadow: '0 3px 0 rgba(38, 59, 58, 0.06)',
     position: 'sticky',
     top: 0,
     zIndex: 100,
   },
   inner: {
-    maxWidth: 900,
+    maxWidth: 1040,
     margin: '0 auto',
     padding: '0 20px',
     display: 'flex',
     alignItems: 'center',
-    height: 60,
+    height: 68,
     position: 'relative',
   },
   logo: {
@@ -74,21 +79,23 @@ const styles = {
     marginRight: 'auto',
   },
   logoIcon: {
-    background: '#2E7D32',
+    background: '#d86f45',
     color: 'white',
-    width: 36,
-    height: 36,
-    borderRadius: '50%',
+    width: 38,
+    height: 38,
+    borderRadius: '12px 12px 12px 4px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     fontWeight: 700,
-    fontSize: 18,
+    fontSize: 19,
+    boxShadow: '0 3px 0 #b85435',
   },
   logoText: {
     fontWeight: 700,
-    fontSize: 20,
-    color: '#333',
+    fontSize: 21,
+    color: '#263b3a',
+    letterSpacing: '-0.3px',
   },
   hamburger: {
     display: 'none',
@@ -106,21 +113,21 @@ const styles = {
   },
   linksOpen: {},
   link: {
-    color: '#555',
+    color: '#526361',
     textDecoration: 'none',
-    fontWeight: 500,
+    fontWeight: 600,
     fontSize: 15,
     padding: '8px 4px',
   },
   saveBtn: {
-    color: '#FFA726',
+    color: '#d86f45',
     fontWeight: 600,
   },
   logoutBtn: {
     background: 'none',
-    border: '2px solid #E53935',
+    border: '2px solid #c9574d',
     borderRadius: 8,
-    color: '#E53935',
+    color: '#c9574d',
     padding: '6px 16px',
     fontWeight: 600,
     fontSize: 14,

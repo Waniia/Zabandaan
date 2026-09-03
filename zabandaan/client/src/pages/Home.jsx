@@ -5,12 +5,14 @@ import { usePoints } from '../context/PointsContext';
 import ComingSoon from '../components/ComingSoon';
 import Navbar from '../components/Navbar';
 import api from '../api';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function Home() {
   const { user, isGuest, loading: authLoading } = useAuth();
   const { points, loadPoints } = usePoints();
   const [progress, setProgress] = useState({});
   const navigate = useNavigate();
+  const { t, isUrdu } = useLanguage();
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -71,40 +73,40 @@ export default function Home() {
 
   const categories = [
     {
-      id: 'alphabets', title: 'Alphabets', subtitle: 'Urdu Harf',
-      description: 'Trace and learn all 39 Urdu letters with guided stroke practice',
+      id: 'alphabets', title: t('alphabets', 'Alphabets'), subtitle: isUrdu ? 'اردو حروف' : 'Urdu Harf',
+      description: isUrdu ? 'رہنمائی کے ساتھ اردو کے ۳۹ حروف لکھنا سیکھیں' : 'Trace and learn all 39 Urdu letters with guided stroke practice',
       icon: '✏️', route: '/alphabets', total: 39, progressKey: 'alphabets', working: true,
-      accent: '#43A047', accentBg: '#E8F5E9',
+      accent: '#3d8661', accentBg: '#e4f0e5',
     },
     {
-      id: 'numbers', title: 'Numbers', subtitle: 'Urdu Adad',
-      description: 'Learn to read and write Urdu numerals ۱ through ۱۰',
+      id: 'numbers', title: t('numbers', 'Numbers'), subtitle: isUrdu ? 'اردو اعداد' : 'Urdu Adad',
+      description: isUrdu ? 'اردو کے ۱ سے ۱۰ تک اعداد پڑھنا اور لکھنا سیکھیں' : 'Learn to read and write Urdu numerals ۱ through ۱۰',
       icon: '🔢', route: '/numbers', total: 10, progressKey: 'numbers', working: true,
-      accent: '#1E88E5', accentBg: '#E3F2FD',
+      accent: '#397b91', accentBg: '#e4eff0',
     },
     {
-      id: 'idioms', title: 'Idioms', subtitle: 'Muhavare',
-      description: 'Match Urdu idioms to their meanings with picture clues',
+      id: 'idioms', title: t('idioms', 'Idioms'), subtitle: isUrdu ? 'محاورے' : 'Muhavare',
+      description: isUrdu ? 'تصویری اشاروں سے اردو محاوروں کو ان کے معنی سے ملائیں' : 'Match Urdu idioms to their meanings with picture clues',
       icon: '💬', route: '/difficulty/idioms', total: 10, progressKey: 'idioms', working: true,
-      accent: '#FB8C00', accentBg: '#FFF3E0',
+      accent: '#c67b3f', accentBg: '#f8ead6',
     },
     {
-      id: 'wordsearch', title: 'Word Search', subtitle: 'Lafz Dhundo',
-      description: 'Find hidden Urdu words in a letter grid puzzle',
-      icon: '🔍', route: '/difficulty/wordsearch', total: 15, progressKey: 'wordsearch', working: true,
-      accent: '#8E24AA', accentBg: '#F3E5F5',
+      id: 'wordsearch', title: t('wordSearch', 'Word Search'), subtitle: isUrdu ? 'لفظ ڈھونڈیں' : 'Lafz Dhundo',
+      description: isUrdu ? 'حروف کی پہیلی میں چھپے ہوئے اردو الفاظ تلاش کریں' : 'Find hidden Urdu words in a letter grid puzzle',
+      icon: '🔍', route: '/wordsearch', total: 25, progressKey: 'wordsearch', working: true,
+      accent: '#76608d', accentBg: '#eee8f1',
     },
     {
-      id: 'adjectives', title: 'Adjectives', subtitle: 'Sifaat',
-      description: 'Learn descriptive Urdu words by matching pictures to adjectives',
+      id: 'adjectives', title: t('adjectives', 'Adjectives'), subtitle: isUrdu ? 'صفات' : 'Sifaat',
+      description: isUrdu ? 'تصویروں کو صفات سے ملا کر اردو کے وضاحتی الفاظ سیکھیں' : 'Learn descriptive Urdu words by matching pictures to adjectives',
       icon: '🌟', route: '/adjectives', total: 15, progressKey: 'adjectives', working: true,
-      accent: '#F4511E', accentBg: '#FBE9E7',
+      accent: '#c9574d', accentBg: '#f8e5df',
     },
     {
-      id: 'poetry', title: 'Poetry', subtitle: 'Shairi',
-      description: 'Explore classic Urdu poetry couplets and their meanings',
+      id: 'poetry', title: t('poetry', 'Poetry'), subtitle: isUrdu ? 'شاعری' : 'Shairi',
+      description: isUrdu ? 'اردو شاعری کے اشعار اور ان کے معنی دریافت کریں' : 'Explore classic Urdu poetry couplets and their meanings',
       icon: '📜', route: '/poetry', total: 12, progressKey: 'poetry', working: true,
-      accent: '#6D4C41', accentBg: '#EFEBE9',
+      accent: '#80634e', accentBg: '#eee7dd',
     },
   ];
 
@@ -113,17 +115,22 @@ export default function Home() {
       <Navbar />
       <div style={styles.container}>
         <div style={styles.welcome}>
-          <h1 style={styles.welcomeTitle}>
-            Welcome, {user.name}! 👋
-          </h1>
-          <p style={styles.welcomeSub}>
-            {isGuest ? 'Playing as guest — save your progress anytime from Profile' : 'Ready to learn some Urdu today?'}
-          </p>
+          <div>
+            <p style={styles.welcomeKicker}>{t('learningDesk', 'YOUR LEARNING DESK')}</p>
+            <h1 style={styles.welcomeTitle}>{t('welcome', 'Welcome')}, {user.name}!</h1>
+            <p style={styles.welcomeSub}>
+              {isGuest ? t('guestNote', 'Playing as guest — your practice is saved on this device.') : (isUrdu ? 'تھوڑی سی اردو مشق بہت آگے لے جاتی ہے۔' : 'A little Urdu practice goes a long way.')}
+            </p>
+          </div>
+          <div style={styles.dailyMark}>
+            <span style={styles.dailyMarkNumber}>{points}</span>
+            <span style={styles.dailyMarkLabel}>{isUrdu ? <>حاصل کردہ<br />پوائنٹس</> : <>points<br />earned</>}</span>
+          </div>
         </div>
 
         {points === 0 && (
           <div style={styles.emptyState}>
-            <p>🌱 Start with <strong>Alphabets</strong> to learn your first Urdu letters!</p>
+            <p>🌱 {isUrdu ? 'اپنے پہلے اردو حروف سیکھنے کے لیے' : 'Start with'} <strong>{t('alphabets', 'Alphabets')}</strong> {isUrdu ? 'سے شروع کریں!' : 'to learn your first Urdu letters!'}</p>
           </div>
         )}
 
@@ -165,50 +172,83 @@ const styles = {
     padding: 24,
   },
   welcome: {
-    marginBottom: 24,
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    marginBottom: 30,
+    padding: '18px 0 6px',
+    borderBottom: '1px solid #dfd5be',
+  },
+  welcomeKicker: {
+    margin: 0,
+    color: '#d86f45',
+    fontSize: 11,
+    fontWeight: 800,
+    letterSpacing: 1.8,
   },
   welcomeTitle: {
-    fontSize: 28,
-    fontWeight: 700,
-    color: '#333',
+    fontSize: 34,
+    fontWeight: 800,
+    color: '#263b3a',
     margin: 0,
   },
   welcomeSub: {
-    color: '#888',
+    color: '#687572',
     margin: '4px 0 0',
     fontSize: 15,
   },
-  emptyState: {
-    background: '#E8F5E9',
+  dailyMark: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 9,
+    color: '#9d6423',
+    background: '#fff4d9',
+    border: '1px solid #e5b65d',
     borderRadius: 12,
+    padding: '9px 14px',
+  },
+  dailyMarkNumber: {
+    fontSize: 26,
+    fontWeight: 800,
+  },
+  dailyMarkLabel: {
+    fontSize: 11,
+    lineHeight: 1.15,
+    fontWeight: 700,
+  },
+  emptyState: {
+    background: '#e4f0e5',
+    border: '1px dashed #8dbb96',
+    borderRadius: 10,
     padding: '16px 20px',
     marginBottom: 20,
-    color: '#2E7D32',
+    color: '#286448',
     fontSize: 15,
   },
   grid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
-    gap: 16,
+    gap: 20,
   },
   card: {
-    background: 'white',
-    borderRadius: 12,
-    padding: 24,
+    background: '#fffdf7',
+    borderRadius: 16,
+    border: '1px solid #dfd5be',
+    padding: 26,
     textAlign: 'center',
     cursor: 'pointer',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+    boxShadow: '0 3px 0 rgba(38, 59, 58, 0.08)',
     transition: 'all 0.3s ease',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     gap: 4,
-    minHeight: 180,
+    minHeight: 200,
   },
   iconBadge: {
     width: 60,
     height: 60,
-    borderRadius: '50%',
+    borderRadius: '14px 14px 14px 4px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -221,37 +261,37 @@ const styles = {
     margin: 0,
     fontSize: 20,
     fontWeight: 700,
-    color: '#333',
+    color: '#263b3a',
   },
   cardSub: {
     margin: 0,
     fontSize: 13,
-    color: '#888',
+    color: '#687572',
     fontFamily: "'Noto Nastaliq Urdu', serif",
   },
   cardDesc: {
     margin: '4px 0 0',
     fontSize: 12,
-    color: '#AAA',
+    color: '#7f8b86',
     lineHeight: 1.4,
   },
   progressWrap: {
     width: '100%',
     height: 6,
-    background: '#EEE',
+    background: '#e8e0cf',
     borderRadius: 3,
     overflow: 'hidden',
     marginTop: 8,
   },
   progressBar: {
     height: '100%',
-    background: 'linear-gradient(90deg, #66BB6A, #2E7D32)',
+    background: '#3d8661',
     borderRadius: 3,
     transition: 'width 0.5s ease',
   },
   progressLabel: {
     fontSize: 12,
-    color: '#999',
+    color: '#7f8b86',
     marginTop: 2,
   },
 };

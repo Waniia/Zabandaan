@@ -18,11 +18,11 @@
 const db = require("./db");
 
 /* =================================================================== */
-/* IDIOMS — 20 total (10 easy + 10 hard)                                */
+/* IDIOMS — 23 total across three progressive levels                      */
 /* =================================================================== */
 
 const idioms = [
-  /* ---------- Easy (with illustrations from client/public/images/idioms/) ---------- */
+  /* ---------- Level 1 (with illustrations) ---------- */
 
   {
     idiom_urdu: "آنکھوں کا تارا",
@@ -135,7 +135,7 @@ const idioms = [
     image_path: "/images/idioms/ulti-ganga.png",
   },
 
-  /* ---------- Hard (no illustrations) ---------- */
+  /* ---------- Level 2 and Level 3 ---------- */
 
   {
     idiom_urdu: "نو دو گیارہ ہونا",
@@ -248,6 +248,47 @@ const idioms = [
     image_path: null,
   },
 ];
+
+const bilingual = (urdu, english) => JSON.stringify({ urdu, english });
+const idiomExamples = {
+  "اپنے پاؤں پر کلہاڑی مارنا": "علی نے اچھی نوکری چھوڑ کر اپنے پاؤں پر کلہاڑی مار لی۔",
+  "تِل کا تاڑ بنانا": "تم نے تو تِل کا تاڑ بنا دیا، بات اتنی بڑی نہیں تھی۔",
+  "دانت کھٹے کرنا": "ہماری ٹیم نے مخالف ٹیم کے دانت کھٹے کر دیے۔",
+  "چراغ تلے اندھیرا": "وہ سب کی مدد کرتا ہے مگر اپنے گھر کے مسائل سے بے خبر ہے، واقعی چراغ تلے اندھیرا ہے۔",
+  "ہوا میں قلعے بنانا": "صرف خواب دیکھنے سے کچھ نہیں ہوگا، ہوا میں قلعے بنانا چھوڑو اور محنت کرو۔",
+  "گڑے مردے اکھاڑنا": "پرانی لڑائی ختم ہو چکی ہے، اب گڑے مردے اکھاڑنے سے کیا فائدہ؟",
+  "کھسیانی بلی کھمبا نوچے": "امتحان میں ناکام ہونے کے بعد وہ سب کو الزام دینے لگا، کھسیانی بلی کھمبا نوچے۔",
+  "اندھوں میں کانا راجا": "باقی سب طلبہ نے تیاری ہی نہیں کی تھی، اس لیے معمولی تیاری والا طالب علم اندھوں میں کانا راجا بن گیا۔",
+  "آستین کا سانپ": "جس دوست پر اسے سب سے زیادہ بھروسا تھا، وہی آستین کا سانپ نکلا۔",
+  "ناکوں چنے چبوانا": "ہماری ٹیم نے مخالف کھلاڑیوں کو ناکوں چنے چبوا دیے۔",
+  "خون کے آنسو رونا": "بیٹے کی ناکامی پر ماں نے خون کے آنسو روئے۔",
+  "منہ میں رام رام، بغل میں چھری": "وہ سامنے تو بہت میٹھی باتیں کرتا ہے، مگر پیچھے نقصان پہنچاتا ہے؛ منہ میں رام رام، بغل میں چھری۔",
+  "نہ نو من تیل ہوگا، نہ رادھا ناچے گی": "وہ ایسی شرطیں لگا رہا ہے جو کبھی پوری نہیں ہوں گی؛ نہ نو من تیل ہوگا، نہ رادھا ناچے گی۔",
+};
+const newIdioms = [
+  ["اپنے پاؤں پر کلہاڑی مارنا", "Apne paaon par kulhari maarna", "خود اپنا نقصان کرنا", "To harm oneself", "دوسروں کو نقصان پہنچانا", "To harm others", "بہت کامیاب ہونا", "To become very successful", "مدد حاصل کرنا", "To receive help", 2, "apne-paaon-kulhari.png"],
+  ["تِل کا تاڑ بنانا", "Til ka taar banana", "چھوٹی بات کو بہت بڑھانا", "To exaggerate a small matter", "بات کو راز رکھنا", "To keep a matter secret", "جلدی فیصلہ کرنا", "To decide quickly", "سچ بولنا", "To tell the truth", 2, "til-taar.png"],
+  ["دانت کھٹے کرنا", "Daant khatte karna", "بری طرح شکست دینا", "To defeat someone badly", "دوستی کرنا", "To make friends", "معافی مانگنا", "To apologize", "خوش ہونا", "To feel happy", 2, "daant-khatte.png"],
+  ["چراغ تلے اندھیرا", "Chiragh tale andhera", "قریب کی چیز سے بے خبر رہنا", "To overlook what is nearby", "ہر چیز کو جاننا", "To know everything", "اندھیرے سے ڈرنا", "To fear darkness", "روشنی پھیلانا", "To spread light", 2, "chiragh-tale-andhera.png"],
+  ["ہوا میں قلعے بنانا", "Hawa mein qile banana", "غیر حقیقی منصوبے بنانا", "To make unrealistic plans", "محنت سے کام کرنا", "To work hard", "گھر بنانا", "To build a house", "سفر کی تیاری کرنا", "To prepare for a journey", 2, "hawa-qile.png"],
+  ["گڑے مردے اکھاڑنا", "Gare murde ukharna", "پرانی باتیں دوبارہ چھیڑنا", "To bring up old issues", "نئی بات شروع کرنا", "To start a new topic", "مردوں کو دفن کرنا", "To bury the dead", "کسی کی مدد کرنا", "To help someone", 2, "gare-murde.png"],
+  ["کھسیانی بلی کھمبا نوچے", "Khisiyani billi khamba noche", "اپنی ناکامی یا شرمندگی کا غصہ دوسروں پر نکالنا", "To take frustration out on others", "خوشی سے ناچنا", "To dance with joy", "بلی کو کھانا دینا", "To feed a cat", "اپنی غلطی ماننا", "To admit one's mistake", 3, "khisyani-billi.png"],
+  ["اندھوں میں کانا راجا", "Andhon mein kana raja", "نااہل لوگوں میں معمولی قابل شخص بھی نمایاں ہونا", "A mediocre person standing out among the incapable", "بادشاہ بن جانا", "To become a king", "سب سے کمزور ہونا", "To be the weakest", "آنکھوں کا علاج کرنا", "To treat the eyes", 3, "andhon-kana-raja.png"],
+  ["آستین کا سانپ", "Aasteen ka saanp", "اپنا ہی شخص جو چھپ کر نقصان پہنچائے", "A trusted person who secretly harms you", "وفادار دوست", "A loyal friend", "سانپ پالنا", "To keep a snake", "خطرے سے بچنا", "To avoid danger", 3, "aasteen-ka-saanp.png"],
+  ["ناکوں چنے چبوانا", "Naakon chane chabwana", "کسی کو بہت زیادہ پریشان کرنا", "To trouble someone greatly", "کسی کی مدد کرنا", "To help someone", "چنے کھانا", "To eat chickpeas", "آسانی پیدا کرنا", "To make things easy", 3, "naakon-chane-chabwana.png"],
+  ["خون کے آنسو رونا", "Khoon ke aansu rona", "انتہائی دکھ یا تکلیف برداشت کرنا", "To suffer extreme grief or pain", "خوشی منانا", "To celebrate happiness", "رونا بند کرنا", "To stop crying", "بیمار کی مدد کرنا", "To help a patient", 3, "khoon-aansu.png"],
+  ["منہ میں رام رام، بغل میں چھری", "Mun mein Ram Ram, baghal mein chhuri", "بظاہر خیرخواہ مگر اندر سے دشمن ہونا", "To appear kind while being an enemy within", "سچا دوست ہونا", "To be a true friend", "چھری سے کام کرنا", "To work with a knife", "دعا مانگنا", "To pray", 3, "mun-ram-chhuri.png"],
+  ["نہ نو من تیل ہوگا، نہ رادھا ناچے گی", "Na nau man tel hoga na Radha nachegi", "ایسی ناممکن شرط رکھنا جس سے کام ہی نہ ہو سکے", "To set an impossible condition that prevents action", "فوراً کام مکمل کرنا", "To finish work immediately", "تیل خریدنا", "To buy oil", "رقص دیکھنا", "To watch a dance", 3, "na-nau-man.png"],
+].map(([idiom_urdu, idiom_roman, cu, ce, d1u, d1e, d2u, d2e, d3u, d3e, level, image]) => ({
+  idiom_urdu, idiom_roman,
+  correct_meaning: bilingual(cu, ce), distractor_1: bilingual(d1u, d1e),
+  distractor_2: bilingual(d2u, d2e), distractor_3: bilingual(d3u, d3e),
+  example_sentence: idiomExamples[idiom_urdu] || cu,
+  difficulty: `level-${level}`, image_path: `/images/idioms/${image}`,
+}));
+idioms.splice(10);
+idioms.forEach(item => { item.difficulty = "level-1"; });
+idioms.push(...newIdioms);
 
 /* =================================================================== */
 /* POETRY — 12 couplets (4 Iqbal, 4 Faiz, 4 Ghalib)                     */

@@ -2,9 +2,9 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const db = require('../db');
+const { JWT_SECRET } = require('../config');
 
 const router = express.Router();
-const JWT_SECRET = process.env.JWT_SECRET || 'zabandaan-dev-secret-key';
 
 function signToken(user) {
   return jwt.sign({ id: user.id, name: user.name, email: user.email }, JWT_SECRET, { expiresIn: '30d' });

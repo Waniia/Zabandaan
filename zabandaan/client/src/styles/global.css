@@ -17,6 +17,10 @@ body {
   color: var(--color-text);
   line-height: 1.6;
   min-height: 100vh;
+  background-image:
+    radial-gradient(circle at 15% 10%, rgba(216, 111, 69, 0.06) 0 2px, transparent 2px),
+    radial-gradient(circle at 85% 30%, rgba(23, 107, 104, 0.05) 0 1px, transparent 1px);
+  background-size: 28px 28px, 36px 36px;
 }
 
 .urdu-text {
@@ -65,19 +69,23 @@ input, textarea {
 .btn-primary {
   background: var(--color-primary);
   color: white;
+  box-shadow: 0 3px 0 #0d4f4d;
 }
 .btn-primary:hover {
-  background: #1B5E20;
-  transform: translateY(-1px);
+  background: #0f5a58;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 0 #0d4f4d;
 }
 
 .btn-accent {
   background: var(--color-accent);
   color: white;
+  box-shadow: 0 3px 0 #b85435;
 }
 .btn-accent:hover {
-  background: #F57C00;
-  transform: translateY(-1px);
+  background: #c9613e;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 0 #b85435;
 }
 
 .btn-outline {
@@ -104,9 +112,11 @@ input, textarea {
   box-shadow: var(--shadow);
   padding: 20px;
   transition: all var(--transition);
+  border: 1px solid var(--color-border);
 }
 .card:hover {
   box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
 }
 
 .form-group {
@@ -129,6 +139,7 @@ input, textarea {
 }
 .form-group input:focus {
   border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(23, 107, 104, 0.12);
 }
 
 .error-msg {
@@ -187,5 +198,16 @@ input, textarea {
   .btn {
     padding: 10px 16px;
     font-size: 0.9rem;
+  }
+  .login-landing {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+  }
+  .login-landing > div:first-child {
+    text-align: center;
+  }
+  .login-landing > div:first-child .logoCircle {
+    margin-left: auto;
+    margin-right: auto;
   }
 }

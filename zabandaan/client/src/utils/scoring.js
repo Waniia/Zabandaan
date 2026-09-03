@@ -154,3 +154,73 @@ export function scoreSimpleTrace(userPath, referencePath, canvasWidth, canvasHei
   );
   return result.total;
 }
+
+/**
+ * Score a trace against the actual rendered glyph.
+ *
+ * The alphabet guide is rendered by the browser's Urdu font, so using the
+ * same glyph as the scoring mask keeps the visible target and validation in
+ * sync even when the font changes.
+ */
+export function scoreGlyphTrace(userStrokes, letter, canvasSize, font, verticalOffset = 0) {
+  const points = (userStrokes || [])
+    .filter(stroke => stroke.type === 'main')
+    .flatMap(stroke => stroke.points || []);
+
+  if (points.length < 4) return { total: 0, mainScore: 0, dotScore: 0 };
+
+  const mask = document.createElement('canvas');
+  mask.width = canvasSize;
+  mask.height = canvasSize;
+  const ctx = mask.getContext('2d', { willReadFrequently: true });
+  ctx.font = font;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#000';
+  ctx.fillText(letter, canvasSize / 2, canvasSize / 2 + verticalOffset);
+
+  const pixels = ctx.getImageData(0, 0, canvasSize, canvasSize).data;
+  // Keep the hit area close to the glyph so drawing beside the letter does
+  // not receive a passing score.
+  const radius = Math.max(3, canvasSize * 0.012);
+  let matched = 0;
+  const glyphPoints = [];
+
+  for (let y = 0; y < canvasSize; y += 3) {
+    for (let x = 0; x < canvasSize; x += 3) {
+      if (pixels[(y * canvasSize + x) * 4 + 3] > 20) {
+        glyphPoints.push({ x, y });
+      }
+    }
+  }
+
+  for (const point of points) {
+    const left = Math.max(0, Math.floor(point.x - radius));
+    const right = Math.min(canvasSize - 1, Math.ceil(point.x + radius));
+    const top = Math.max(0, Math.floor(point.y - radius));
+    const bottom = Math.min(canvasSize - 1, Math.ceil(point.y + radius));
+    let onGlyph = false;
+
+    for (let y = top; y <= bottom && !onGlyph; y++) {
+      for (let x = left; x <= right; x++) {
+        if (pixels[(y * canvasSize + x) * 4 + 3] > 0) {
+          onGlyph = true;
+          break;
+        }
+      }
+    }
+    if (onGlyph) matched++;
+  }
+
+  const userAlignment = matched / points.length;
+  const glyphCoverage = glyphPoints.length === 0
+    ? 0
+    : glyphPoints.filter(glyphPoint => points.some(point => {
+      const dx = point.x - glyphPoint.x;
+      const dy = point.y - glyphPoint.y;
+      return Math.sqrt(dx * dx + dy * dy) <= radius * 2.5;
+    })).length / glyphPoints.length;
+  const mainScore = Math.round(Math.min(userAlignment, glyphCoverage) * 100);
+
+  return { total: mainScore, mainScore, dotScore: 100 };
+}

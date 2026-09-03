@@ -160,6 +160,7 @@ export default function AdjectivesGame() {
             />
           </div>
 
+          <p className="urdu-text" style={styles.sentenceText}>{current.sentence_urdu}</p>
           <p style={styles.promptText}>Which adjective matches this picture?</p>
 
           {/* Options */}
@@ -289,6 +290,14 @@ const styles = {
     color: '#555',
     textAlign: 'center',
     margin: '0 0 16px',
+  },
+  sentenceText: {
+    margin: '14px 0 8px',
+    fontSize: 24,
+    lineHeight: 1.8,
+    color: '#1B5E20',
+    direction: 'rtl',
+    textAlign: 'center',
   },
   optionsGrid: {
     display: 'grid',

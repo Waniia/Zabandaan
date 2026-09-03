@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
+import LanguageToggle from '../components/LanguageToggle';
 
 export default function Login() {
   const [mode, setMode] = useState('landing'); // landing | login | register
@@ -13,6 +15,7 @@ export default function Login() {
 
   const { login, register, continueAsGuest } = useAuth();
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -49,17 +52,29 @@ export default function Login() {
   if (mode === 'landing') {
     return (
       <div style={styles.container}>
-        <div style={styles.hero}>
-          <div style={styles.logoCircle}>Z</div>
-          <h1 style={styles.title}>Zabandaan</h1>
-          <p style={styles.tagline}>Learn Urdu the fun way — alphabets, idioms, word puzzles, and poetry, all in one place.</p>
-          
-          <div style={styles.btnGroup}>
+        <div style={styles.languageControl}><LanguageToggle /></div>
+        <div className="login-landing" style={styles.landing}>
+          <div style={styles.hero}>
+            <div style={styles.kicker}>URDU, ONE LITTLE STEP AT A TIME</div>
+            <div style={styles.logoCircle}>Z</div>
+            <h1 style={styles.title}>Zabandaan</h1>
+            <p style={styles.urduTitle}>زبان سیکھیں، مزے سے</p>
+            <p style={styles.tagline}>A friendly place to trace letters, discover words, and make Urdu part of your day.</p>
+            <div style={styles.lessonNote}>
+              <span style={styles.noteDot}></span>
+              <span>Short practice. Real progress.</span>
+            </div>
+          </div>
+
+          <div style={styles.entryCard}>
+            <p style={styles.entryEyebrow}>{t('startLearning', 'START LEARNING')}</p>
+            <h2 style={styles.entryTitle}>{t('whereBegin', 'Where shall we begin?')}</h2>
+            <div style={styles.btnGroup}>
             <button onClick={() => setMode('register')} style={styles.btnPrimary}>
-              Create Account
+              {t('createAccount', 'Create Account')}
             </button>
             <button onClick={() => setMode('login')} style={styles.btnOutline}>
-              Log In
+              {t('login', 'Log In')}
             </button>
             <div style={styles.divider}>
               <span style={styles.dividerLine}></span>
@@ -69,14 +84,15 @@ export default function Login() {
             <div style={styles.guestRow}>
               <input
                 type="text"
-                placeholder="Your name (optional)"
+                placeholder={t('optionalName', 'Your name (optional)')}
                 value={guestName}
                 onChange={e => setGuestName(e.target.value)}
                 style={styles.guestInput}
               />
               <button onClick={handleGuest} style={styles.btnGhost}>
-                Continue as Guest
+                {t('guest', 'Continue as Guest')}
               </button>
+            </div>
             </div>
           </div>
         </div>
@@ -154,46 +170,110 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    background: 'linear-gradient(135deg, #FFF8E1 0%, #E8F5E9 100%)',
-    padding: 20,
+    background: '#f7f0df',
+    padding: '32px 20px',
+    backgroundImage: 'radial-gradient(circle at 10% 20%, rgba(216,111,69,0.11) 0 2px, transparent 2px), radial-gradient(circle at 90% 80%, rgba(23,107,104,0.1) 0 2px, transparent 2px)',
+    backgroundSize: '30px 30px, 38px 38px',
+  },
+  languageControl: {
+    position: 'fixed',
+    top: 18,
+    right: 18,
+    zIndex: 2,
+  },
+  landing: {
+    width: '100%',
+    maxWidth: 980,
+    display: 'grid',
+    gridTemplateColumns: '1.1fr 0.9fr',
+    gap: 56,
+    alignItems: 'center',
+  },
+  kicker: {
+    color: '#d86f45',
+    fontSize: 12,
+    fontWeight: 800,
+    letterSpacing: 2,
+    marginBottom: 24,
   },
   hero: {
-    textAlign: 'center',
-    maxWidth: 440,
+    padding: 24,
   },
   logoCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: '50%',
-    background: '#2E7D32',
+    width: 92,
+    height: 92,
+    borderRadius: '28px 28px 28px 8px',
+    background: '#d86f45',
     color: 'white',
-    fontSize: 36,
-    fontWeight: 700,
+    fontSize: 44,
+    fontWeight: 800,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    margin: '0 auto 16px',
-    boxShadow: '0 4px 16px rgba(46,125,50,0.3)',
+    margin: '0 0 22px',
+    boxShadow: '0 6px 0 #b85435',
   },
   title: {
-    fontSize: 40,
-    fontWeight: 700,
-    color: '#333',
-    margin: '0 0 8px',
+    fontSize: 58,
+    fontWeight: 800,
+    color: '#263b3a',
+    margin: '0 0 2px',
+    letterSpacing: '-2px',
+  },
+  urduTitle: {
+    color: '#176b68',
+    fontFamily: "'Noto Nastaliq Urdu', serif",
+    direction: 'rtl',
+    fontSize: 25,
+    margin: '0 0 18px',
   },
   tagline: {
-    fontSize: 17,
-    color: '#666',
+    fontSize: 18,
+    color: '#687572',
     lineHeight: 1.6,
-    marginBottom: 32,
+    maxWidth: 460,
+    marginBottom: 24,
+  },
+  lessonNote: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 9,
+    color: '#526361',
+    fontSize: 14,
+    fontWeight: 700,
+  },
+  noteDot: {
+    width: 10,
+    height: 10,
+    borderRadius: '50%',
+    background: '#3d8661',
   },
   btnGroup: {
     display: 'flex',
     flexDirection: 'column',
     gap: 12,
   },
+  entryCard: {
+    background: '#fffdf7',
+    border: '1px solid #dfd5be',
+    borderRadius: 20,
+    padding: 34,
+    boxShadow: '0 7px 0 rgba(38, 59, 58, 0.1)',
+  },
+  entryEyebrow: {
+    color: '#d86f45',
+    fontSize: 11,
+    fontWeight: 800,
+    letterSpacing: 1.7,
+    margin: 0,
+  },
+  entryTitle: {
+    color: '#263b3a',
+    fontSize: 27,
+    margin: '8px 0 24px',
+  },
   btnPrimary: {
-    background: '#2E7D32',
+    background: '#176b68',
     color: 'white',
     border: 'none',
     padding: '14px 32px',
@@ -201,12 +281,13 @@ const styles = {
     fontSize: 16,
     fontWeight: 600,
     cursor: 'pointer',
-    transition: 'all 0.3s',
+    transition: 'all 0.2s',
+    boxShadow: '0 3px 0 #0d4f4d',
   },
   btnOutline: {
     background: 'transparent',
-    color: '#2E7D32',
-    border: '2px solid #2E7D32',
+    color: '#176b68',
+    border: '2px solid #176b68',
     padding: '14px 32px',
     borderRadius: 10,
     fontSize: 16,
@@ -215,7 +296,7 @@ const styles = {
     transition: 'all 0.3s',
   },
   btnGhost: {
-    background: '#FFA726',
+    background: '#d86f45',
     color: 'white',
     border: 'none',
     padding: '14px 24px',
@@ -224,6 +305,7 @@ const styles = {
     fontWeight: 600,
     cursor: 'pointer',
     whiteSpace: 'nowrap',
+    flex: '1 1 180px',
   },
   divider: {
     display: 'flex',
@@ -234,36 +316,39 @@ const styles = {
   dividerLine: {
     flex: 1,
     height: 1,
-    background: '#DDD',
+    background: '#dfd5be',
   },
   dividerText: {
-    color: '#999',
+    color: '#7f8b86',
     fontSize: 14,
   },
   guestRow: {
     display: 'flex',
     gap: 8,
+    flexWrap: 'wrap',
   },
   guestInput: {
     flex: 1,
+    minWidth: 0,
     padding: '12px 16px',
-    border: '2px solid #E0E0E0',
+    border: '2px solid #dfd5be',
     borderRadius: 10,
     fontSize: 15,
     outline: 'none',
   },
   formCard: {
-    background: 'white',
-    borderRadius: 16,
+    background: '#fffdf7',
+    borderRadius: 18,
     padding: 32,
     maxWidth: 400,
     width: '100%',
-    boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+    border: '1px solid #dfd5be',
+    boxShadow: '0 7px 0 rgba(38, 59, 58, 0.1)',
   },
   backBtn: {
     background: 'none',
     border: 'none',
-    color: '#666',
+    color: '#687572',
     fontSize: 14,
     cursor: 'pointer',
     marginBottom: 16,
@@ -272,27 +357,27 @@ const styles = {
   formTitle: {
     fontSize: 24,
     fontWeight: 700,
-    color: '#333',
+    color: '#263b3a',
     marginBottom: 24,
   },
   formGroup: {
     marginBottom: 16,
   },
   error: {
-    color: '#E53935',
+    color: '#c9574d',
     fontSize: 14,
     marginTop: 4,
   },
   switchText: {
     textAlign: 'center',
-    color: '#888',
+    color: '#687572',
     fontSize: 14,
     marginTop: 16,
   },
   linkBtn: {
     background: 'none',
     border: 'none',
-    color: '#2E7D32',
+    color: '#176b68',
     fontWeight: 600,
     cursor: 'pointer',
     fontSize: 14,

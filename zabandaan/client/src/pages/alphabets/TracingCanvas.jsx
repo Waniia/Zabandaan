@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect, useCallback, useMemo } from 'react';
 import { speak } from '../../utils/speech';
 import SpeakerIcon from '../../components/SpeakerIcon';
-import { scoreTrace } from '../../utils/scoring';
+import { scoreGlyphTrace } from '../../utils/scoring';
 
 export default function TracingCanvas({ letter, onComplete }) {
   const canvasRef = useRef(null);
@@ -12,23 +12,21 @@ export default function TracingCanvas({ letter, onComplete }) {
   const [score, setScore] = useState(null);
   const [canvasSize, setCanvasSize] = useState(350);
   const [autoPlayed, setAutoPlayed] = useState(false); // whether auto-speak succeeded
+  const [fontReady, setFontReady] = useState(false);
   const dpr = typeof window !== 'undefined' ? (window.devicePixelRatio || 1) : 1;
-
-  const strokes = letter.strokes;
-  // Memoize derived stroke data — recomputed only when the letter's strokes change
-  const mainStroke = useMemo(
-    () => letter.strokes.find(s => s.type === 'main'),
-    [letter.strokes]
-  );
-  const dotStrokes = useMemo(
-    () => letter.strokes.filter(s => s.type === 'dot'),
-    [letter.strokes]
-  );
-  const hasDots = useMemo(() => dotStrokes.length > 0, [dotStrokes]);
-  const expectedDotPositions = useMemo(
-    () => dotStrokes.flatMap(s => s.points),
-    [dotStrokes]
-  );
+  const guideFont = `${canvasSize * 0.72}px 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', serif`;
+  const guideBaseLetter = {
+    'ب': 'ب', 'پ': 'ب', 'ت': 'ب', 'ٹ': 'ب', 'ث': 'ب',
+    'ج': 'ح', 'چ': 'ح', 'خ': 'خ',
+    'ڈ': 'د', 'ذ': 'د',
+    'ڑ': 'ر', 'ز': 'ر', 'ژ': 'ر',
+    'ش': 'س', 'ض': 'ص', 'ظ': 'ط',
+    'غ': 'ع', 'ف': 'ف', 'ق': 'ق', 'گ': 'ک',
+    'ن': 'ن', 'ی': 'ی',
+  }[letter.letter] || letter.letter;
+  // Render the complete glyph so distinguishing dots and the ڑ/ژ topi remain
+  // visible, while scoring the trace against only the shared base shape.
+  const guideLetter = letter.letter;
 
   // Responsive canvas size
   useEffect(() => {
@@ -41,11 +39,24 @@ export default function TracingCanvas({ letter, onComplete }) {
     return () => window.removeEventListener('resize', updateSize);
   }, []);
 
+  // Redraw after the web font loads; canvas does not automatically repaint
+  // text that was drawn while the fallback font was active.
+  useEffect(() => {
+    setFontReady(false);
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => setFontReady(true));
+    } else {
+      setFontReady(true);
+    }
+  }, [letter]);
+
   // Speak letter name on load; track whether auto-speak succeeded
   useEffect(() => {
     setAutoPlayed(false);
     const timer = setTimeout(async () => {
-      const result = await speak(letter.nameUrdu, 'ur-PK', { audioUrl: letter.audioPath });
+      const result = await speak(letter.nameUrdu, 'ur-PK', {
+        audioUrl: letter.audioPath || `/audio/alphabets/${letter.id}.mp3`,
+      });
       setAutoPlayed(result && result.ended);
     }, 400);
     return () => clearTimeout(timer);
@@ -71,60 +82,15 @@ export default function TracingCanvas({ letter, onComplete }) {
     ctx.fillStyle = '#FEFEFE';
     ctx.fillRect(0, 0, size, size);
 
-    // Faint letter guide
+    // The rendered glyph is the guide. This keeps the visible target aligned
+    // with the letter shape instead of showing a separate generic skeleton.
     ctx.save();
-    ctx.font = `${size * 0.55}px 'Noto Nastaliq Urdu', serif`;
+    ctx.font = guideFont;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillStyle = 'rgba(0,0,0,0.05)';
-    ctx.fillText(letter.letter, size / 2, size / 2);
+    ctx.fillStyle = 'rgba(117,117,117,0.18)';
+    ctx.fillText(guideLetter, size / 2, size / 2 + size * 0.08);
     ctx.restore();
-
-    // Draw reference main path (dotted, smooth)
-    if (mainStroke) {
-      const pts = mainStroke.points;
-      ctx.beginPath();
-      ctx.setLineDash([8, 6]);
-      ctx.strokeStyle = '#BDBDBD';
-      ctx.lineWidth = 3;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-
-      if (pts.length > 2) {
-        ctx.moveTo(pts[0].x * size, pts[0].y * size);
-        for (let i = 1; i < pts.length - 1; i++) {
-          const xc = (pts[i].x * size + pts[i + 1].x * size) / 2;
-          const yc = (pts[i].y * size + pts[i + 1].y * size) / 2;
-          ctx.quadraticCurveTo(pts[i].x * size, pts[i].y * size, xc, yc);
-        }
-        const last = pts[pts.length - 1];
-        ctx.lineTo(last.x * size, last.y * size);
-      }
-      ctx.stroke();
-      ctx.setLineDash([]);
-
-      // Start marker (green circle)
-      ctx.fillStyle = '#66BB6A';
-      ctx.beginPath();
-      ctx.arc(pts[0].x * size, pts[0].y * size, 7, 0, Math.PI * 2);
-      ctx.fill();
-
-      // End marker (red circle)
-      const endPt = pts[pts.length - 1];
-      ctx.fillStyle = '#E53935';
-      ctx.beginPath();
-      ctx.arc(endPt.x * size, endPt.y * size, 7, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    // Draw the letter's dots as pre-filled reference marks — they are part of
-    // the letter reference itself, not interactive targets
-    for (const dot of expectedDotPositions) {
-      ctx.beginPath();
-      ctx.arc(dot.x * size, dot.y * size, size * 0.035, 0, Math.PI * 2);
-      ctx.fillStyle = '#757575';
-      ctx.fill();
-    }
 
     // Draw completed user main strokes (smooth)
     for (const stroke of userStrokes) {
@@ -165,7 +131,7 @@ export default function TracingCanvas({ letter, onComplete }) {
       ctx.lineTo(pts[pts.length - 1].x, pts[pts.length - 1].y);
       ctx.stroke();
     }
-  }, [userStrokes, currentStroke, letter, canvasSize, mainStroke, expectedDotPositions, dpr]);
+  }, [userStrokes, currentStroke, letter, canvasSize, guideFont, dpr, fontReady]);
 
   const getPos = useCallback((e) => {
     const canvas = canvasRef.current;
@@ -219,9 +185,13 @@ export default function TracingCanvas({ letter, onComplete }) {
   };
 
   const checkScore = () => {
-    // Dots are pre-rendered reference marks — score the main stroke only
-    const mainStrokesOnly = userStrokes.filter(s => s.type === 'main');
-    const result = scoreTrace(mainStrokesOnly, strokes, canvasSize);
+    const result = scoreGlyphTrace(
+      userStrokes,
+      guideBaseLetter,
+      canvasSize,
+      guideFont,
+      canvasSize * 0.08
+    );
     setScore(result);
     setMode('done');
   };
@@ -247,7 +217,11 @@ export default function TracingCanvas({ letter, onComplete }) {
       <div style={styles.header}>
         <div style={styles.letterDisplay}>
           <span style={styles.letterChar} className="urdu-text">{letter.letter}</span>
-          <SpeakerIcon text={letter.nameUrdu} size={24} audioUrl={letter.audioPath} />
+          <SpeakerIcon
+            text={letter.nameUrdu}
+            size={24}
+            audioUrl={letter.audioPath || `/audio/alphabets/${letter.id}.mp3`}
+          />
         </div>
         <div style={styles.letterInfo}>
           <strong>{letter.name}</strong>
@@ -265,7 +239,9 @@ export default function TracingCanvas({ letter, onComplete }) {
         <button
           style={styles.tapPrompt}
           onClick={() => {
-            speak(letter.nameUrdu, 'ur-PK', { audioUrl: letter.audioPath }).then(() => setAutoPlayed(true));
+            speak(letter.nameUrdu, 'ur-PK', {
+              audioUrl: letter.audioPath || `/audio/alphabets/${letter.id}.mp3`,
+            }).then(() => setAutoPlayed(true));
           }}
         >
           🔊 Tap to hear "{letter.name}"
@@ -294,7 +270,7 @@ export default function TracingCanvas({ letter, onComplete }) {
       <div style={styles.instructionBox}>
         {mode === 'main' && !mainDrawn && (
           <p style={styles.hint}>
-            Draw the main stroke following the dotted path{hasDots ? ' — the dots are already drawn for you' : ''}
+            Trace the visible grey letter shape{letter.letter === 'خ' ? ' including the dot' : ''}
           </p>
         )}
         {mode === 'main' && mainDrawn && (

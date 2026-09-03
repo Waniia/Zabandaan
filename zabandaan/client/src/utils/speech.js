@@ -9,6 +9,18 @@ let voicesReadyPromise = null;
 // Currently active Audio element (for stopSpeaking)
 let currentAudio = null;
 
+function resolveAudioUrl(audioUrl) {
+  if (!audioUrl || typeof window === 'undefined') return audioUrl;
+
+  // Data files use /audio/... paths. Resolve them against Vite's base so the
+  // same files work when the client is hosted below the domain root.
+  if (audioUrl.startsWith('/')) {
+    const base = import.meta.env.BASE_URL || '/';
+    return new URL(audioUrl.slice(1), new URL(base, window.location.origin)).href;
+  }
+  return new URL(audioUrl, document.baseURI).href;
+}
+
 // --- Web Speech API voice initialization (used as fallback) ---
 function initVoices() {
   if (typeof window === 'undefined' || !window.speechSynthesis) return;
@@ -61,8 +73,8 @@ function getVoicesAsync(timeout = 2000) {
   return voicesReadyPromise;
 }
 
-function findBestVoice(lang) {
-  const voices = voicesCache;
+function findBestVoice(lang, availableVoices = voicesCache) {
+  const voices = availableVoices;
   if (voices.length === 0) return null;
 
   return voices.find(v => v.lang === 'ur-PK')
@@ -71,64 +83,90 @@ function findBestVoice(lang) {
     || voices.find(v => v.lang === 'hi-IN')
     || voices.find(v => v.lang.startsWith('hi'))
     || voices.find(v => v.lang === 'ar-SA')
-    || voices.find(v => v.lang.startsWith('ar'))
-    || voices[0];
+    || voices.find(v => v.lang.startsWith('ar'));
 }
 
 // --- Primary: Play a pre-recorded audio file ---
 function speakAudioFile(audioUrl) {
   return new Promise((resolve) => {
+    if (typeof window === 'undefined' || typeof Audio === 'undefined') {
+      resolve({ ended: false });
+      return;
+    }
+
     // Stop any previous audio
     if (currentAudio) {
       currentAudio.pause();
       currentAudio = null;
     }
 
-    const audio = new Audio(audioUrl);
+    let audio;
+    try {
+      audio = new Audio(resolveAudioUrl(audioUrl));
+    } catch (error) {
+      console.warn('Unable to create audio element:', error);
+      resolve({ ended: false });
+      return;
+    }
+    audio.preload = 'auto';
     currentAudio = audio;
+    let settled = false;
+    let timeoutId;
+    const finish = (ended) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeoutId);
+      if (currentAudio === audio) currentAudio = null;
+      resolve({ ended });
+    };
 
     audio.onended = () => {
-      if (currentAudio === audio) currentAudio = null;
-      resolve({ ended: true });
+      finish(true);
     };
 
-    audio.onerror = (e) => {
-      console.warn('Audio file playback error:', e);
-      if (currentAudio === audio) currentAudio = null;
-      resolve({ ended: false });
+    audio.onerror = () => {
+      console.warn(`Audio file playback error: ${audioUrl}`);
+      finish(false);
     };
 
+    timeoutId = setTimeout(() => finish(false), 10000);
+
+    // Calling play directly is important: waiting for canplaythrough can
+    // lose the user-activation required by browsers for media playback.
     audio.play().catch((err) => {
       console.warn('Audio play() rejected:', err);
-      if (currentAudio === audio) currentAudio = null;
-      resolve({ ended: false });
+      finish(false);
     });
   });
 }
 
 // --- Fallback: Web Speech API ---
 function speakWithWebSpeech(text, lang = 'ur-PK') {
-  return new Promise(async (resolve) => {
-    if (!window.speechSynthesis) return resolve({ ended: false });
-
-    window.speechSynthesis.cancel();
-    await getVoicesAsync(2000);
-    await new Promise(r => Promise.resolve().then(r));
-
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = lang;
-    utterance.rate = 0.85;
-    utterance.pitch = 1.0;
-    utterance.volume = 1.0;
-
-    const voice = findBestVoice(lang);
-    if (voice) utterance.voice = voice;
-
-    utterance.onend = () => resolve({ ended: true });
-    utterance.onerror = () => resolve({ ended: false });
+  return new Promise((resolve) => {
+    if (typeof window === 'undefined' || !window.speechSynthesis || !text) {
+      resolve({ ended: false });
+      return;
+    }
 
     try {
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.resume();
+      const availableVoices = window.speechSynthesis.getVoices();
+      if (availableVoices.length > 0) {
+        voicesCache = availableVoices;
+        voicesReady = true;
+      }
+      const utterance = new SpeechSynthesisUtterance(text);
+      const voice = findBestVoice(lang, availableVoices);
+      utterance.lang = voice ? voice.lang : lang;
+      utterance.rate = 0.85;
+      utterance.pitch = 1.0;
+      utterance.volume = 1.0;
+      if (voice) utterance.voice = voice;
+      utterance.onend = () => resolve({ ended: true });
+      utterance.onerror = () => resolve({ ended: false });
       window.speechSynthesis.speak(utterance);
+      window.speechSynthesis.resume();
     } catch (e) {
       console.warn('Speech synthesis error:', e);
       resolve({ ended: false });
@@ -145,14 +183,13 @@ function speakWithWebSpeech(text, lang = 'ur-PK') {
  * @returns {Promise<{ended: boolean}>}
  */
 export async function speak(text, lang = 'ur-PK', options = {}) {
-  // If a local audio file is provided, play it first
+  if (!text) return { ended: false };
+
   if (options.audioUrl) {
     const result = await speakAudioFile(options.audioUrl);
     if (result.ended) return result;
-    // Fall through to Web Speech API if file playback failed
   }
 
-  // Fallback to Web Speech API
   return speakWithWebSpeech(text, lang);
 }
 
@@ -164,7 +201,7 @@ export function stopSpeaking() {
     currentAudio = null;
   }
   // Stop Web Speech API
-  if (window.speechSynthesis) {
+  if (typeof window !== 'undefined' && window.speechSynthesis) {
     window.speechSynthesis.cancel();
   }
 }
