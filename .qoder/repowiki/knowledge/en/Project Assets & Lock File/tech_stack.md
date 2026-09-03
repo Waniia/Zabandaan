@@ -1,1 +1,0 @@
-npm lockfile v3; image assets in PNG format.

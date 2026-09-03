@@ -1,1 +1,0 @@
-Holds the project's npm lock file and screenshot assets documenting UI pages for the Zabandaan application.

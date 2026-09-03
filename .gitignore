@@ -13,3 +13,9 @@ dist/
 *.db-wal
 .DS_Store
 Thumbs.db
+.qoder/
+.aicoding-chat-workspace
+vibe_images/
+*_preview*.png
+screenshot_*.png
+0*_*.png

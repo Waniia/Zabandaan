@@ -1,2 +1,0 @@
-- Screenshots are named with a sequential numeric prefix followed by a descriptive page name (e.g., `01_login_page.png`, `02_home_dashboard.png`) to preserve display order.
-- The `package-lock.json` is kept minimal with an empty `packages` map, indicating no installed dependencies at this level.
