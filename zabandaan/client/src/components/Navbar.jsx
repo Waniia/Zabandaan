@@ -21,7 +21,7 @@ export default function Navbar() {
     <nav style={styles.nav}>
       <div style={styles.inner}>
         <Link to="/" style={styles.logo}>
-          <span style={styles.logoIcon}>Z</span>
+          <img src="/images/zabandaan-logo.png" alt="Zabandaan" style={styles.logoIcon} />
           <span style={styles.logoText}>Zabandaan</span>
         </Link>
 
@@ -79,17 +79,11 @@ const styles = {
     marginRight: 'auto',
   },
   logoIcon: {
-    background: '#d86f45',
-    color: 'white',
     width: 38,
     height: 38,
-    borderRadius: '12px 12px 12px 4px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontWeight: 700,
-    fontSize: 19,
-    boxShadow: '0 3px 0 #b85435',
+    borderRadius: 10,
+    objectFit: 'cover',
+    boxShadow: '0 3px 0 rgba(38, 59, 58, 0.18)',
   },
   logoText: {
     fontWeight: 700,

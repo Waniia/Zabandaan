@@ -56,7 +56,7 @@ export default function Login() {
         <div className="login-landing" style={styles.landing}>
           <div style={styles.hero}>
             <div style={styles.kicker}>URDU, ONE LITTLE STEP AT A TIME</div>
-            <div style={styles.logoCircle}>Z</div>
+            <img src="/images/zabandaan-logo.png" alt="Zabandaan logo" style={styles.logoCircle} />
             <h1 style={styles.title}>Zabandaan</h1>
             <p style={styles.urduTitle}>زبان سیکھیں، مزے سے</p>
             <p style={styles.tagline}>A friendly place to trace letters, discover words, and make Urdu part of your day.</p>
@@ -202,16 +202,10 @@ const styles = {
   logoCircle: {
     width: 92,
     height: 92,
-    borderRadius: '28px 28px 28px 8px',
-    background: '#d86f45',
-    color: 'white',
-    fontSize: 44,
-    fontWeight: 800,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+    borderRadius: 24,
+    objectFit: 'cover',
     margin: '0 0 22px',
-    boxShadow: '0 6px 0 #b85435',
+    boxShadow: '0 6px 0 rgba(38, 59, 58, 0.16)',
   },
   title: {
     fontSize: 58,
