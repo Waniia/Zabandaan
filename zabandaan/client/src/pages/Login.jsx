@@ -202,10 +202,10 @@ const styles = {
   logoCircle: {
     width: 92,
     height: 92,
-    borderRadius: 24,
+    borderRadius: '50%',
     objectFit: 'cover',
     margin: '0 0 22px',
-    boxShadow: '0 6px 0 rgba(38, 59, 58, 0.16)',
+    boxShadow: 'none',
   },
   title: {
     fontSize: 58,

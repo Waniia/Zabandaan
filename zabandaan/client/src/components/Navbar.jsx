@@ -81,9 +81,9 @@ const styles = {
   logoIcon: {
     width: 38,
     height: 38,
-    borderRadius: 10,
+    borderRadius: '50%',
     objectFit: 'cover',
-    boxShadow: '0 3px 0 rgba(38, 59, 58, 0.18)',
+    boxShadow: 'none',
   },
   logoText: {
     fontWeight: 700,
