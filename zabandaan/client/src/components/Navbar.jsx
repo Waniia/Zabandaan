@@ -14,7 +14,7 @@ export default function Navbar() {
 
   const handleLogout = () => {
     logout();
-    navigate('/');
+    navigate('/login');
   };
 
   return (
@@ -38,15 +38,14 @@ export default function Navbar() {
         }}>
           <Link to="/" style={styles.link} onClick={() => setMenuOpen(false)}>{t('home', 'Home')}</Link>
           <Link to="/profile" style={styles.link} onClick={() => setMenuOpen(false)}>{t('profile', 'Profile')}</Link>
-          {isGuest ? (
+          {isGuest && (
             <Link to="/profile" style={{ ...styles.link, ...styles.saveBtn }} onClick={() => setMenuOpen(false)}>
               {t('saveProgress', 'Save Progress')}
             </Link>
-          ) : (
-            <button style={styles.logoutBtn} onClick={() => { setMenuOpen(false); handleLogout(); }}>
-              {t('logout', 'Logout')}
-            </button>
           )}
+          <button style={styles.logoutBtn} onClick={() => { setMenuOpen(false); handleLogout(); }}>
+            {t('logout', 'Logout')}
+          </button>
         </div>
       </div>
     </nav>
