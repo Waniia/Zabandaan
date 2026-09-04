@@ -3,7 +3,7 @@ import { speak } from '../../utils/speech';
 import SpeakerIcon from '../../components/SpeakerIcon';
 import { scoreGlyphTrace } from '../../utils/scoring';
 
-export default function TracingCanvas({ letter, onComplete }) {
+export default function TracingCanvas({ letter, onComplete, audioFolder = 'alphabets' }) {
   const canvasRef = useRef(null);
   const [userStrokes, setUserStrokes] = useState([]); // [{type:'main', points:[{x,y}]}]
   const [currentStroke, setCurrentStroke] = useState(null); // {points:[{x,y}]} while drawing
@@ -55,7 +55,7 @@ export default function TracingCanvas({ letter, onComplete }) {
     setAutoPlayed(false);
     const timer = setTimeout(async () => {
       const result = await speak(letter.nameUrdu, 'ur-PK', {
-        audioUrl: letter.audioPath || `/audio/alphabets/${letter.id}.mp3`,
+        audioUrl: letter.audioPath || `/audio/${audioFolder}/${letter.id}.mp3`,
       });
       setAutoPlayed(result && result.ended);
     }, 400);
@@ -220,7 +220,7 @@ export default function TracingCanvas({ letter, onComplete }) {
           <SpeakerIcon
             text={letter.nameUrdu}
             size={24}
-            audioUrl={letter.audioPath || `/audio/alphabets/${letter.id}.mp3`}
+            audioUrl={letter.audioPath || `/audio/${audioFolder}/${letter.id}.mp3`}
           />
         </div>
         <div style={styles.letterInfo}>
@@ -240,7 +240,7 @@ export default function TracingCanvas({ letter, onComplete }) {
           style={styles.tapPrompt}
           onClick={() => {
             speak(letter.nameUrdu, 'ur-PK', {
-              audioUrl: letter.audioPath || `/audio/alphabets/${letter.id}.mp3`,
+              audioUrl: letter.audioPath || `/audio/${audioFolder}/${letter.id}.mp3`,
             }).then(() => setAutoPlayed(true));
           }}
         >

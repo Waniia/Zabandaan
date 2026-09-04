@@ -82,6 +82,7 @@ export default function NumberMap() {
             key={numbers[currentNumber].id}
             letter={numbers[currentNumber]}
             onComplete={handleComplete}
+            audioFolder="numbers"
           />
 
           {flash && (
