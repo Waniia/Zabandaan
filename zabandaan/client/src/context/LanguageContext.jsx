@@ -1,6 +1,8 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 
 const translations = {
+  brand: 'زبان دان',
+  loading: 'زبان دان لوڈ ہو رہا ہے...',
   home: 'گھر',
   profile: 'پروفائل',
   saveProgress: 'پیش رفت محفوظ کریں',

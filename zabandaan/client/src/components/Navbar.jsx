@@ -22,7 +22,7 @@ export default function Navbar() {
       <div style={styles.inner}>
         <Link to="/" style={styles.logo}>
           <img src="/images/zabandaan-logo.png" alt="Zabandaan" style={styles.logoIcon} />
-          <span style={styles.logoText}>Zabandaan</span>
+          <span style={styles.logoText}>{t('brand', 'Zabandaan')}</span>
         </Link>
 
         <PointsBadge />

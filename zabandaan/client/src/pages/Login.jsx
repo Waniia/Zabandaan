@@ -57,7 +57,7 @@ export default function Login() {
           <div style={styles.hero}>
             <div style={styles.kicker}>URDU, ONE LITTLE STEP AT A TIME</div>
             <img src="/images/zabandaan-logo.png" alt="Zabandaan logo" style={styles.logoCircle} />
-            <h1 style={styles.title}>Zabandaan</h1>
+            <h1 style={styles.title}>{t('brand', 'Zabandaan')}</h1>
             <p style={styles.urduTitle}>زبان سیکھیں، مزے سے</p>
             <p style={styles.tagline}>A friendly place to trace letters, discover words, and make Urdu part of your day.</p>
             <div style={styles.lessonNote}>

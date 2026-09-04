@@ -11,7 +11,7 @@ import IdiomsGame from './pages/idioms/IdiomsGame';
 import WordSearchGame from './pages/wordsearch/WordSearchGame';
 import PoetryPage from './pages/poetry/PoetryPage';
 import Profile from './pages/Profile';
-import { LanguageProvider } from './context/LanguageContext';
+import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import './styles/global.css';
 
 function ProtectedRoute({ children }) {
@@ -23,6 +23,7 @@ function ProtectedRoute({ children }) {
 
 function AppRoutes() {
   const { user, loading } = useAuth();
+  const { t } = useLanguage();
 
   if (loading) {
     return (
@@ -35,7 +36,7 @@ function AppRoutes() {
         color: '#888',
         fontSize: 18,
       }}>
-        Loading Zabandaan...
+        {t('loading', 'Loading Zabandaan...')}
       </div>
     );
   }
