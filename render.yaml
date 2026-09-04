@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: zabandaan
+    runtime: node
+    plan: free
+    buildCommand: cd zabandaan && npm run install:all && npm run build && npm run seed
+    startCommand: cd zabandaan && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true

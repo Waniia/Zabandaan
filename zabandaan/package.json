@@ -10,7 +10,7 @@
     "dev:client": "cd client && npx vite --host",
     "build": "cd client && npx vite build",
     "seed": "cd server && npm run seed",
-    "start": "npm run dev"
+    "start": "cd server && node index.js"
   },
   "engines": {
     "node": ">=22"
