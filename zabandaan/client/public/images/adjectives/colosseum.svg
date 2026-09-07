@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420">
+  <defs>
+    <linearGradient id="sky" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#dfe8f1"/>
+      <stop offset="100%" stop-color="#f2dfc3"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="420" rx="18" fill="url(#sky)"/>
+  <rect x="0" y="315" width="640" height="105" fill="#c9b495"/>
+  <g>
+    <ellipse cx="320" cy="204" rx="235" ry="138" fill="#c8926a" stroke="#7b563e" stroke-width="10"/>
+    <path d="M117 275h406v20H117z" fill="#a56d4b" stroke="#6d4835" stroke-width="10"/>
+    <g fill="#d8b494" stroke="#7b563e" stroke-width="8">
+      <rect x="150" y="140" width="48" height="118" rx="4"/>
+      <rect x="210" y="140" width="48" height="118" rx="4"/>
+      <rect x="270" y="140" width="48" height="118" rx="4"/>
+      <rect x="330" y="140" width="48" height="118" rx="4"/>
+      <rect x="390" y="140" width="48" height="118" rx="4"/>
+      <rect x="450" y="140" width="48" height="118" rx="4"/>
+    </g>
+    <g fill="#f0d7ba" stroke="#7b563e" stroke-width="8">
+      <path d="M150 140h48v30q0 18-24 18t-24-18v-30z"/>
+      <path d="M210 140h48v30q0 18-24 18t-24-18v-30z"/>
+      <path d="M270 140h48v30q0 18-24 18t-24-18v-30z"/>
+      <path d="M330 140h48v30q0 18-24 18t-24-18v-30z"/>
+      <path d="M390 140h48v30q0 18-24 18t-24-18v-30z"/>
+      <path d="M450 140h48v30q0 18-24 18t-24-18v-30z"/>
+    </g>
+    <g fill="#a56d4b" stroke="#6d4835" stroke-width="7">
+      <path d="M120 198h20v58h-20z"/>
+      <path d="M500 198h20v58h-20z"/>
+    </g>
+    <path d="M120 262h400" stroke="#7b563e" stroke-width="12"/>
+  </g>
+  <g fill="#4d7f47">
+    <path d="M40 320c42-30 66-52 90-78 16 18 26 34 38 62H40z"/>
+    <path d="M540 320c-40-22-63-42-88-72-16 20-25 38-36 63h124z"/>
+  </g>
+  <g fill="#2a3d2b" opacity="0.7">
+    <circle cx="120" cy="85" r="44"/>
+    <circle cx="520" cy="95" r="36"/>
+  </g>
+</svg>
