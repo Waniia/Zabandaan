@@ -9,11 +9,12 @@ export default function DifficultySelect() {
 
   const moduleNames = {
     idioms: 'Idioms',
+    adjectives: 'Adjectives',
     wordsearch: 'Word Search',
   };
 
   const moduleName = isUrdu
-    ? (module === 'idioms' ? 'محاورے' : module === 'wordsearch' ? 'لفظ تلاش کریں' : module)
+    ? (module === 'idioms' ? 'محاورے' : module === 'adjectives' ? 'صفات' : module === 'wordsearch' ? 'لفظ تلاش کریں' : module)
     : (moduleNames[module] || module);
 
   return (
@@ -22,20 +23,20 @@ export default function DifficultySelect() {
       <div style={styles.container}>
         <button onClick={() => navigate('/')} style={styles.backBtn}>← {t('backHome', 'Back to Home')}</button>
         <h1 style={styles.title}>{moduleName}</h1>
-        <p style={styles.subtitle}>{isUrdu ? 'محاورے کی سطح منتخب کریں' : 'Choose an idiom level'}</p>
+        <p style={styles.subtitle}>{isUrdu ? 'اپنی سطح منتخب کریں' : 'Choose a level'}</p>
 
         <div style={styles.btnRow}>
-          {(module === 'idioms' ? [1, 2, 3] : ['easy', 'hard']).map((level, index) => (
+          {(module === 'idioms' || module === 'adjectives' ? [1, 2, 3] : ['easy', 'hard']).map((level, index) => (
             <button
               key={level}
-              onClick={() => navigate(`/${module}/${module === 'idioms' ? `level-${level}` : level}`)}
+              onClick={() => navigate(`/${module}/${module === 'idioms' || module === 'adjectives' ? `level-${level}` : level}`)}
               style={index === 0 ? styles.easyBtn : styles.hardBtn}
               onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'}
               onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
             >
-              <span style={styles.emoji}>{module === 'idioms' ? ['🌱', '🌿', '🔥'][index] : index === 0 ? '😊' : '🔥'}</span>
-              <span style={styles.btnTitle}>{module === 'idioms' ? (isUrdu ? `سطح ${level}` : `Level ${level}`) : level === 'easy' ? (isUrdu ? 'آسان' : 'Easy') : (isUrdu ? 'مشکل' : 'Hard')}</span>
-              <span style={styles.btnDesc}>{module === 'idioms' ? (isUrdu ? `${level === 1 ? 10 : level === 2 ? 6 : 7} محاورے` : `${level === 1 ? 10 : level === 2 ? 6 : 7} idioms`) : (isUrdu ? 'اپنا چیلنج آزمائیں' : 'Challenge yourself')}</span>
+              <span style={styles.emoji}>{module === 'idioms' || module === 'adjectives' ? ['🌱', '🌿', '🔥'][index] : index === 0 ? '😊' : '🔥'}</span>
+              <span style={styles.btnTitle}>{module === 'idioms' || module === 'adjectives' ? (isUrdu ? `سطح ${level}` : `Level ${level}`) : level === 'easy' ? (isUrdu ? 'آسان' : 'Easy') : (isUrdu ? 'مشکل' : 'Hard')}</span>
+              <span style={styles.btnDesc}>{module === 'idioms' || module === 'adjectives' ? (isUrdu ? `${module === 'adjectives' ? 10 : level === 1 ? 10 : level === 2 ? 6 : 7} ${module === 'adjectives' ? 'صفات' : 'محاورے'}` : `${module === 'adjectives' ? 10 : level === 1 ? 10 : level === 2 ? 6 : 7} ${module}`) : (isUrdu ? 'اپنا چیلنج آزمائیں' : 'Challenge yourself')}</span>
             </button>
           ))}
         </div>

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import Navbar from '../../components/Navbar';
 import FeedbackFlash from '../../components/FeedbackFlash';
 import { usePoints } from '../../context/PointsContext';
@@ -15,12 +15,13 @@ function shuffleArray(arr) {
   return a;
 }
 
-const TOTAL = adjectives.length;
-
 export default function AdjectivesGame() {
+  const { difficulty } = useParams();
   const navigate = useNavigate();
   const { addPoints } = usePoints();
   const { isGuest } = useAuth();
+  const levelAdjectives = adjectives.filter(adjective => adjective.difficulty === difficulty);
+  const total = levelAdjectives.length;
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [options, setOptions] = useState([]);
@@ -31,15 +32,15 @@ export default function AdjectivesGame() {
 
   // Build shuffled options whenever the current adjective changes
   useEffect(() => {
-    const adjective = adjectives[currentIndex];
+    const adjective = levelAdjectives[currentIndex];
     if (!adjective) return; // quiz finished (sentinel index)
     setOptions(shuffleArray(adjective.options));
     setSelected(null);
     setFeedback(null);
     setHadWrong(false);
-  }, [currentIndex]);
+  }, [currentIndex, difficulty]);
 
-  const current = adjectives[currentIndex] || null;
+  const current = levelAdjectives[currentIndex] || null;
 
   const handleSelect = useCallback((option) => {
     if (selected !== null) return; // already answered
@@ -49,7 +50,7 @@ export default function AdjectivesGame() {
     if (option === current.adjective_urdu) {
       setFeedback('correct');
       if (!hadWrong) setScore(prev => prev + 1);
-      addPoints('adjectives', null, current.id);
+      addPoints('adjectives', difficulty, current.id);
     } else {
       setFeedback('wrong');
       setHadWrong(true);
@@ -59,10 +60,10 @@ export default function AdjectivesGame() {
   // Called by FeedbackFlash when the flash animation finishes
   const handleFlashDone = useCallback(() => {
     if (feedback === 'correct') {
-      if (currentIndex < TOTAL - 1) {
+      if (currentIndex < total - 1) {
         setCurrentIndex(prev => prev + 1);
       } else {
-        setCurrentIndex(TOTAL); // sentinel: quiz done
+        setCurrentIndex(total); // sentinel: quiz done
       }
     } else {
       // Wrong answer: the correct choice was highlighted during the flash.
@@ -81,7 +82,7 @@ export default function AdjectivesGame() {
   }, []);
 
   // --- Quiz complete ---
-  if (currentIndex >= TOTAL) {
+  if (currentIndex >= total) {
     return (
       <>
         <Navbar />
@@ -90,10 +91,10 @@ export default function AdjectivesGame() {
             <span style={{ fontSize: 56 }}>🎉</span>
             <h2 style={{ margin: '12px 0 4px', color: '#2E7D32' }}>Adjectives Complete!</h2>
             <p style={{ color: '#666', fontSize: 15, margin: '0 0 8px' }}>
-              You finished all {TOTAL} adjectives
+              You finished all {total} adjectives
             </p>
             <p style={{ color: '#FFA726', fontSize: 15, fontWeight: 600, margin: '0 0 20px' }}>
-              First-try score: {score} / {TOTAL}
+              First-try score: {score} / {total}
             </p>
             {isGuest && (
               <p style={{ color: '#999', fontSize: 13, margin: '-12px 0 20px' }}>
@@ -125,18 +126,18 @@ export default function AdjectivesGame() {
             ← Back
           </button>
           <span style={styles.progress}>
-            Adjective {questionNum} of {TOTAL}
+            Adjective {questionNum} of {total}
           </span>
         </div>
 
         {/* Status message */}
         <div style={styles.statusBanner}>
           <span style={styles.statusText}>
-            {questionNum === TOTAL
+            {questionNum === total
               ? '🏁 Last one! Match the final adjective!'
               : questionNum === 1
                 ? '🌱 Starting adjectives — match the picture to the Urdu word!'
-                : `${TOTAL - questionNum + 1} adjectives remaining — keep matching!`}
+                : `${total - questionNum + 1} adjectives remaining — keep matching!`}
           </span>
         </div>
 
@@ -145,7 +146,7 @@ export default function AdjectivesGame() {
           <div
             style={{
               ...styles.progressFill,
-              width: `${(questionNum / TOTAL) * 100}%`,
+              width: `${(questionNum / total) * 100}%`,
             }}
           />
         </div>

@@ -49,7 +49,8 @@ function AppRoutes() {
       <Route path="/difficulty/:module" element={<ProtectedRoute><DifficultySelect /></ProtectedRoute>} />
       <Route path="/alphabets" element={<ProtectedRoute><AlphabetMap /></ProtectedRoute>} />
       <Route path="/numbers" element={<ProtectedRoute><NumberMap /></ProtectedRoute>} />
-      <Route path="/adjectives" element={<ProtectedRoute><AdjectivesGame /></ProtectedRoute>} />
+      <Route path="/adjectives" element={<Navigate to="/difficulty/adjectives" replace />} />
+      <Route path="/adjectives/:difficulty" element={<ProtectedRoute><AdjectivesGame /></ProtectedRoute>} />
       <Route path="/idioms/:difficulty" element={<ProtectedRoute><IdiomsGame /></ProtectedRoute>} />
       <Route path="/wordsearch" element={<ProtectedRoute><WordSearchGame /></ProtectedRoute>} />
       <Route path="/wordsearch/custom" element={<ProtectedRoute><WordSearchGame /></ProtectedRoute>} />

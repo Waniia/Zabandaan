@@ -38,7 +38,9 @@ export default function Home() {
         { storageKey: 'idioms_hard', progressKey: 'idioms_hard' },
         { storageKey: 'wordsearch_easy', progressKey: 'wordsearch_easy' },
         { storageKey: 'wordsearch_hard', progressKey: 'wordsearch_hard' },
-        { storageKey: 'adjectives_none', progressKey: 'adjectives' },
+        { storageKey: 'adjectives_level-1', progressKey: 'adjectives_level-1' },
+        { storageKey: 'adjectives_level-2', progressKey: 'adjectives_level-2' },
+        { storageKey: 'adjectives_level-3', progressKey: 'adjectives_level-3' },
         { storageKey: 'poetry_none', progressKey: 'poetry' },
       ];
       guestKeyMap.forEach(({ storageKey, progressKey }) => {
@@ -67,7 +69,7 @@ export default function Home() {
   if (authLoading || !user) return <div style={{ padding: 40, textAlign: 'center' }}>Loading...</div>;
 
   const getProgressPct = (category, total) => {
-    const count = progress[category] || 0;
+    const count = Array.isArray(category) ? category.reduce((sum, key) => sum + (progress[key] || 0), 0) : (progress[category] || 0);
     return total > 0 ? Math.round((count / total) * 100) : 0;
   };
 
@@ -99,7 +101,7 @@ export default function Home() {
     {
       id: 'adjectives', title: t('adjectives', 'Adjectives'), subtitle: isUrdu ? 'صفات' : 'Sifaat',
       description: isUrdu ? 'تصویروں کو صفات سے ملا کر اردو کے وضاحتی الفاظ سیکھیں' : 'Learn descriptive Urdu words by matching pictures to adjectives',
-      icon: '🌟', route: '/adjectives', total: 15, progressKey: 'adjectives', working: true,
+      icon: '🌟', route: '/difficulty/adjectives', total: 30, progressKeys: ['adjectives_level-1', 'adjectives_level-2', 'adjectives_level-3'], working: true,
       accent: '#c9574d', accentBg: '#f8e5df',
     },
     {
@@ -151,9 +153,9 @@ export default function Home() {
                 <p style={styles.cardSub}>{cat.subtitle}</p>
                 <p style={styles.cardDesc}>{cat.description}</p>
                 <div style={styles.progressWrap}>
-                  <div style={{ ...styles.progressBar, width: `${getProgressPct(cat.progressKey, cat.total)}%`, background: `linear-gradient(90deg, ${cat.accent}88, ${cat.accent})` }} />
+                  <div style={{ ...styles.progressBar, width: `${getProgressPct(cat.progressKeys || cat.progressKey, cat.total)}%`, background: `linear-gradient(90deg, ${cat.accent}88, ${cat.accent})` }} />
                 </div>
-                <span style={styles.progressLabel}>{getProgressPct(cat.progressKey, cat.total)}% complete</span>
+                <span style={styles.progressLabel}>{getProgressPct(cat.progressKeys || cat.progressKey, cat.total)}% complete</span>
               </div>
             ) : (
               <ComingSoon key={cat.id} title={cat.title} subtitle={cat.subtitle} />
