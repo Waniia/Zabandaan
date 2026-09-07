@@ -63,9 +63,9 @@ progress.
 
 ## Security
 
-- Do not commit `.env` or `.env.*` files.
+- No commit `.env` or `.env.*` files.
 - Use `server/.env.example` as the template for required variables.
-- Do not commit API keys, tokens, passwords, or credentials.
+- No API keys, tokens, passwords, or credentials.
 - The local SQLite database is intentionally ignored because it can contain
   user password hashes and progress.
 
