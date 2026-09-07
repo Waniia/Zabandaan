@@ -55,6 +55,32 @@ const parseOption = (value) => {
   return { urdu: optionTranslations[value] || value, english: value };
 };
 
+const getIdiomsDifficultyAliases = (difficulty) => {
+  const normalized = String(difficulty || '').trim().toLowerCase();
+
+  if (!normalized) return [];
+
+  const aliases = new Set([normalized]);
+
+  if (normalized === 'level-1' || normalized === 'easy') {
+    aliases.add('level-1');
+    aliases.add('easy');
+  }
+
+  if (normalized === 'level-2' || normalized === 'hard') {
+    aliases.add('level-2');
+    aliases.add('level-3');
+    aliases.add('hard');
+  }
+
+  if (normalized === 'level-3') {
+    aliases.add('level-3');
+    aliases.add('hard');
+  }
+
+  return Array.from(aliases);
+};
+
 // Cache-Control for all content routes
 router.use((req, res, next) => {
   res.set('Cache-Control', 'no-store');
@@ -64,16 +90,29 @@ router.use((req, res, next) => {
 // GET /idioms/:difficulty
 router.get('/idioms/:difficulty', (req, res) => {
   try {
-    const rows = db.prepare('SELECT * FROM idioms_content WHERE difficulty = ?').all(req.params.difficulty)
-      .map(row => ({
-        ...row,
-        audio_path: `/audio/idioms/${row.id}.mp3`,
-        correct_option: parseOption(row.correct_meaning),
-        distractor_1_option: parseOption(row.distractor_1),
-        distractor_2_option: parseOption(row.distractor_2),
-        distractor_3_option: parseOption(row.distractor_3),
-      }));
-    res.json({ idioms: rows });
+    const requestedDifficulty = String(req.params.difficulty || '').trim();
+    const aliases = getIdiomsDifficultyAliases(requestedDifficulty);
+    let rows = [];
+
+    for (const difficulty of aliases) {
+      rows = db.prepare('SELECT * FROM idioms_content WHERE difficulty = ?').all(difficulty);
+      if (rows.length > 0) break;
+    }
+
+    if (rows.length === 0) {
+      rows = db.prepare('SELECT * FROM idioms_content').all();
+    }
+
+    const formattedRows = rows.map(row => ({
+      ...row,
+      audio_path: `/audio/idioms/${row.id}.mp3`,
+      correct_option: parseOption(row.correct_meaning),
+      distractor_1_option: parseOption(row.distractor_1),
+      distractor_2_option: parseOption(row.distractor_2),
+      distractor_3_option: parseOption(row.distractor_3),
+    }));
+
+    res.json({ idioms: formattedRows });
   } catch (err) {
     console.error('get idioms error:', err);
     res.status(500).json({ error: 'Server error' });

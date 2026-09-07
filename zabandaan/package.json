@@ -6,7 +6,7 @@
   "scripts": {
     "install:all": "npm install && cd client && npm install && cd ../server && npm install",
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
-    "dev:server": "cd server && node index.js",
+    "dev:server": "cd server && node --watch index.js",
     "dev:client": "cd client && npx vite --host",
     "build": "cd client && npx vite build",
     "seed": "cd server && npm run seed",
@@ -19,7 +19,8 @@
     "concurrently": "^10.0.5"
   },
   "devDependencies": {
-    "msedge-tts": "^2.0.7"
+    "msedge-tts": "^2.0.7",
+    "pptxgenjs": "^4.0.1"
   },
   "allowScripts": {
     "msedge-tts@2.0.7": true

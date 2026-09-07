@@ -13,4 +13,25 @@ db.exec('PRAGMA foreign_keys = ON');
 const schema = fs.readFileSync(SCHEMA_PATH, 'utf-8');
 db.exec(schema);
 
+const hasAnyContent = () => {
+  const tables = [
+    'idioms_content',
+    'wordsearch_wordlists',
+    'poetry_content',
+  ];
+
+  return tables.every((table) => {
+    const row = db.prepare(`SELECT COUNT(*) AS count FROM ${table}`).get();
+    return Number(row.count) > 0;
+  });
+};
+
 module.exports = db;
+
+if (!hasAnyContent()) {
+  try {
+    require('./seed.js');
+  } catch (error) {
+    console.error('Failed to seed database with starter content:', error);
+  }
+}
